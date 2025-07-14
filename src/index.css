@@ -1,0 +1,308 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 60% 16%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 60% 16%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 60% 16%;
+
+    --primary: 25 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 25 100% 50%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 60% 16%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 60% 16%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 60% 16%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 25 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply container mx-auto px-4 md:px-6;
+  }
+  
+  .section-padding {
+    @apply py-12 md:py-20;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold mb-4 md:mb-6;
+  }
+  
+  .section-subtitle {
+    @apply text-lg text-muted-foreground mb-8;
+  }
+  
+  .cta-button {
+    @apply bg-stakerpol-orange hover:bg-orange-600 text-white font-semibold py-2 md:py-3 px-4 md:px-6 rounded-md transition-all duration-300 inline-flex items-center justify-center shadow-md hover:shadow-lg transform hover:-translate-y-1 text-sm md:text-base;
+  }
+  
+  .secondary-button {
+    @apply bg-secondary hover:bg-gray-200 text-stakerpol-navy font-medium py-2 md:py-3 px-4 md:px-6 rounded-md transition-all duration-300 inline-flex items-center justify-center shadow-sm hover:shadow transform hover:-translate-y-1 text-sm md:text-base;
+  }
+  
+  .image-hover-zoom {
+    @apply overflow-hidden;
+  }
+  
+  .image-hover-zoom img {
+    @apply transition-transform duration-500 ease-in-out hover:scale-110;
+  }
+  
+  /* Improved responsive grid layout for better desktop presentation */
+  .product-grid-desktop {
+    @apply grid gap-6;
+    /* Mobile: 1 column */
+    grid-template-columns: 1fr;
+  }
+  
+  /* Tablet: 2 columns with better spacing */
+  @media (min-width: 768px) {
+    .product-grid-desktop {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  }
+  
+  /* Desktop: 3 columns with generous spacing */
+  @media (min-width: 1024px) {
+    .product-grid-desktop {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+  }
+  
+  /* Large desktop: 4 columns for better space utilization */
+  @media (min-width: 1200px) {
+    .product-grid-desktop {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      padding: 0 2rem;
+    }
+  }
+  
+  /* Extra large desktop: maintain 4 columns with more spacing */
+  @media (min-width: 1440px) {
+    .product-grid-desktop {
+      gap: 2.5rem;
+      padding: 0 3rem;
+    }
+  }
+  
+  /* Better button spacing on mobile */
+  .button-group {
+    @apply flex flex-col gap-2 md:gap-3;
+  }
+  
+  .button-group.horizontal {
+    @apply flex-col sm:flex-row;
+  }
+  
+  /* Enhanced product card spacing for desktop */
+  @media (min-width: 1024px) {
+    .product-card-enhanced {
+      @apply mb-4;
+    }
+    
+    .product-card-enhanced .card-content {
+      @apply p-8;
+    }
+    
+    .product-card-enhanced h3 {
+      @apply text-2xl mb-4;
+    }
+    
+    .product-card-enhanced p {
+      @apply text-base leading-relaxed mb-6;
+    }
+  }
+  
+  /* Desktop constraints for product detail images */
+  @media (min-width: 1024px) {
+    .product-detail-image .aspect-\[3\/4\] {
+      max-width: 500px;
+      max-height: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Thumbnail gallery constraints */
+    .product-detail-thumbnails .aspect-\[3\/4\] {
+      max-height: 80px;
+    }
+  }
+  
+  /* Extra large desktop - further constraints for product detail */
+  @media (min-width: 1440px) {
+    .product-detail-image .aspect-\[3\/4\] {
+      max-width: 550px;
+      max-height: 650px;
+    }
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expand-text {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.animate-zoom-in {
+  animation: zoom-in 0.3s ease-out;
+}
+
+.animate-pulse-light {
+  animation: pulse-light 2s infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-expand-text {
+  animation: expand-text 0.3s ease-out;
+}
+
+/* Dodatkowe responsywne poprawki */
+@media (max-width: 640px) {
+  .cta-button, .secondary-button {
+    @apply text-sm py-2 px-4;
+  }
+  
+  .button-group {
+    @apply gap-2;
+  }
+}
