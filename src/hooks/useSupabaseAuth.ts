@@ -17,7 +17,7 @@ export const useSupabaseAuth = () => {
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
 
         console.log('🔐 Auth state changed:', event, session?.user?.email);
@@ -25,43 +25,56 @@ export const useSupabaseAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check admin role with proper error handling
+          // Defer admin role check to avoid deadlocks inside the callback
           setAdminLoading(true);
-          try {
-            console.log('👤 Checking admin role for user:', session.user.id);
-            const { data, error } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .single();
-            
+          const userId = session.user.id;
+
+          // Failsafe timeout: never block UI indefinitely
+          let timeoutId = window.setTimeout(() => {
             if (!mounted) return;
-            
-            if (!error && data) {
-              const userIsAdmin = data.role === 'admin';
-              console.log('🛡️ User role check result:', data.role, '| isAdmin:', userIsAdmin);
-              setIsAdmin(userIsAdmin);
+            console.warn('⏱️ Admin role check timed out, falling back');
+            setIsAdmin(false);
+            setAdminLoading(false);
+          }, 5000);
+
+          setTimeout(async () => {
+            try {
+              console.log('👤 Checking admin role for user:', userId);
+              const { data, error } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', userId)
+                .single();
               
-              // Auto-redirect admin users to admin panel after successful sign in
-              if (userIsAdmin && event === 'SIGNED_IN') {
-                console.log('🚀 Admin user signed in, redirecting to /admin');
-                // Use setTimeout to avoid redirect conflicts
-                setTimeout(() => {
-                  if (window.location.pathname !== '/admin') {
-                    window.location.href = '/admin';
-                  }
-                }, 1000);
+              if (!mounted) return;
+              
+              if (!error && data) {
+                const userIsAdmin = data.role === 'admin';
+                console.log('🛡️ User role check result:', data.role, '| isAdmin:', userIsAdmin);
+                setIsAdmin(userIsAdmin);
+                
+                // Auto-redirect admin users to admin panel after successful sign in
+                if (userIsAdmin && event === 'SIGNED_IN') {
+                  console.log('🚀 Admin user signed in, redirecting to /admin');
+                  // Use setTimeout to avoid redirect conflicts
+                  setTimeout(() => {
+                    if (window.location.pathname !== '/admin') {
+                      window.location.href = '/admin';
+                    }
+                  }, 300);
+                }
+              } else {
+                console.log('⚠️ User role check failed:', error?.message || 'No role found');
+                setIsAdmin(false);
               }
-            } else {
-              console.log('⚠️ User role check failed:', error?.message || 'No role found');
-              setIsAdmin(false);
+            } catch (error) {
+              console.error('❌ Error checking admin role:', error);
+              if (mounted) setIsAdmin(false);
+            } finally {
+              if (timeoutId) clearTimeout(timeoutId);
+              if (mounted) setAdminLoading(false);
             }
-          } catch (error) {
-            console.error('❌ Error checking admin role:', error);
-            if (mounted) setIsAdmin(false);
-          } finally {
-            if (mounted) setAdminLoading(false);
-          }
+          }, 0);
         } else {
           // User logged out
           console.log('👋 User logged out');

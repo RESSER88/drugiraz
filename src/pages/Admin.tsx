@@ -16,7 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 
 const Admin = () => {
-  const { user, loading: authLoading, isAdmin, adminLoading } = useSupabaseAuth();
+  const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
   const { 
     products, 
     isLoading: productsLoading, 
@@ -116,6 +116,13 @@ const Admin = () => {
   if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="absolute top-4 right-4">
+          {user && (
+            <Button variant="outline" onClick={signOut}>
+              Wyloguj
+            </Button>
+          )}
+        </div>
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-stakerpol-orange mx-auto mb-4" />
           <p className="text-gray-600">
@@ -138,12 +145,19 @@ const Admin = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-stakerpol-navy mb-2">
-            Panel Administracyjny
-          </h1>
-          <p className="text-gray-600">
-            Zarządzanie produktami i systemem
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-stakerpol-navy mb-2">
+                Panel Administracyjny
+              </h1>
+              <p className="text-gray-600">
+                Zarządzanie produktami i systemem
+              </p>
+            </div>
+            <Button variant="outline" onClick={signOut}>
+              Wyloguj
+            </Button>
+          </div>
           
           {/* Enhanced Migration Status Card */}
           <div className="mt-4 p-4 border rounded-lg bg-white">
