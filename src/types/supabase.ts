@@ -29,6 +29,7 @@ const toSlug = (name: string, serial?: string) => {
 export const mapSupabaseProductToProduct = (supabaseProduct: SupabaseProduct, images: SupabaseProductImage[] = []) => {
   return {
     id: supabaseProduct.id,
+    slug: (supabaseProduct as any).slug || undefined,
     model: supabaseProduct.name,
     image: supabaseProduct.image_url || (images.length > 0 ? images[0].image_url : ''),
     images: images.map(img => img.image_url).filter(Boolean),
