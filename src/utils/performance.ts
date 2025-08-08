@@ -52,10 +52,26 @@ export const measurePerformance = {
 // Web Vitals monitoring
 export const trackWebVitals = () => {
   if (typeof window !== 'undefined') {
+    const sendToGA = (name: string, value: number, id?: string) => {
+      try {
+        if (window.gtag) {
+          window.gtag('event', name, {
+            value,
+            event_category: 'Web Vitals',
+            event_label: id || document.location.pathname,
+            non_interaction: true,
+          });
+        }
+      } catch (e) {
+        // no-op
+      }
+    };
+
     // Track Largest Contentful Paint (LCP)
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         console.log('LCP:', entry.startTime);
+        sendToGA('LCP', entry.startTime, (entry as any).id);
       }
     }).observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -64,7 +80,9 @@ export const trackWebVitals = () => {
       for (const entry of list.getEntries()) {
         const fidEntry = entry as any; // Type assertion for FID specific properties
         if (fidEntry.processingStart) {
-          console.log('FID:', fidEntry.processingStart - entry.startTime);
+          const fid = fidEntry.processingStart - entry.startTime;
+          console.log('FID:', fid);
+          sendToGA('FID', fid, fidEntry.id);
         }
       }
     }).observe({ entryTypes: ['first-input'] });
@@ -79,6 +97,7 @@ export const trackWebVitals = () => {
         }
       }
       console.log('CLS:', clsValue);
+      sendToGA('CLS', Number(clsValue.toFixed(4)));
     }).observe({ entryTypes: ['layout-shift'] });
   }
 };
@@ -86,5 +105,6 @@ export const trackWebVitals = () => {
 declare global {
   interface Window {
     html2canvas?: any;
+    gtag?: (...args: any[]) => void;
   }
 }

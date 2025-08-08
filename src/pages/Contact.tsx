@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Phone, Mail, Clock, Building } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
+import { Helmet } from 'react-helmet-async';
 
 const Contact = () => {
   const { language } = useLanguage();
@@ -11,6 +12,14 @@ const Contact = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>Kontakt – Stakerpol | Wózki widłowe BT Toyota</title>
+        <meta name="description" content="Skontaktuj się ze Stakerpol: wózki widłowe BT Toyota, serwis i części. Godziny: Pon-Pt 8:00–17:00. Adres: ul. Międzyleśna 115, 32-095 Celiny." />
+        <link rel="canonical" href="https://stakerpol.pl/contact" />
+        <meta property="og:title" content="Kontakt – Stakerpol" />
+        <meta property="og:description" content="Wózki widłowe BT Toyota – kontakt, adres i godziny otwarcia. Celiny, ul. Międzyleśna 115." />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <section className="bg-white py-12">
         <div className="container-custom">
           <div className="text-center mb-12">

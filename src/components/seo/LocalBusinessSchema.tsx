@@ -36,6 +36,20 @@ const LocalBusinessSchema = ({ includeOfferCatalog = true }: LocalBusinessSchema
     ],
     "hasMap": "https://www.google.com/maps?q=ul.+Mi%C4%99dzyle%C5%9Bna+115,+32-095+Celiny",
 
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 50.278735,
+      "longitude": 19.995502
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:00",
+        "closes": "17:00"
+      }
+    ],
+
     "hasOfferCatalog": includeOfferCatalog ? {
       "@type": "OfferCatalog",
       "name": "Wózki widłowe BT Toyota",
@@ -72,7 +86,7 @@ const LocalBusinessSchema = ({ includeOfferCatalog = true }: LocalBusinessSchema
       "Wynajem krótkoterminowy",
       "Doradztwo techniczne"
     ]
-  };
+  } as const;
 
   // Remove undefined properties
   const cleanSchema = JSON.parse(JSON.stringify(schema));

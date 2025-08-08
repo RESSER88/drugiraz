@@ -4,6 +4,7 @@ import CallToAction from '@/components/ui/CallToAction';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const Testimonials = () => {
   const { language } = useLanguage();
@@ -64,6 +65,14 @@ const Testimonials = () => {
 
   return (
     <Layout>
+      <Helmet>
+        <title>Opinie klientów – Stakerpol</title>
+        <meta name="description" content="Opinie klientów o Stakerpol: wózki widłowe BT Toyota, sprzedaż, serwis i wynajem. Sprawdź rekomendacje i dodaj własną opinię." />
+        <link rel="canonical" href="https://stakerpol.pl/testimonials" />
+        <meta property="og:title" content="Opinie klientów – Stakerpol" />
+        <meta property="og:description" content="Sprawdź opinie klientów o Stakerpol i dodaj własną recenzję." />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <section className="bg-gradient-to-b from-gray-100 to-white py-12 md:py-20">
         <div className="container-custom">
           <h1 className="text-4xl font-bold mb-6 text-center animate-fade-in">{t('customerOpinions')}</h1>
