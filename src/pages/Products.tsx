@@ -8,6 +8,8 @@ import { useTranslation } from '@/utils/translations';
 import { usePublicSupabaseProducts } from '@/hooks/usePublicSupabaseProducts';
 import { Link } from 'react-router-dom';
 import { Shield, Loader2 } from 'lucide-react';
+import FAQSection from '@/components/ui/FAQSection';
+import FAQSchema from '@/components/seo/FAQSchema';
 
 const Products = () => {
   const { language } = useLanguage();
@@ -56,6 +58,24 @@ const Products = () => {
     );
   };
 
+  const categoryFaqItems = [
+    {
+      question: 'W jakich warunkach najlepiej sprawdzą się wózki BT SWE?',
+      answer: 'Najlepiej wewnątrz i na równych powierzchniach; świetnie nadają się do prac magazynowych, załadunku i rozładunku.',
+    },
+    {
+      question: 'Jak dobrać długość wideł do europalet?',
+      answer: 'Standardowa długość 1150 mm pasuje do większości europalet. Dłuższe widły stosuje się do niestandardowych ładunków.',
+    },
+    {
+      question: 'Czy zapewniacie transport zakupionych wózków?',
+      answer: 'Tak, organizujemy bezpieczny transport na terenie kraju. Koszt zależy od odległości i parametrów wózka.',
+    },
+    {
+      question: 'Jak bezpiecznie ładować baterię wózka?',
+      answer: 'Zaparkować, wyłączyć wózek, zapewnić wentylację i używać dedykowanego prostownika oraz środków ochrony.',
+    },
+  ];
   return (
     <Layout>
       <section className="bg-gradient-to-b from-stakerpol-lightgray to-white py-12">
@@ -78,6 +98,8 @@ const Products = () => {
           {renderContent()}
         </div>
       </section>
+      <FAQSection title="FAQ – wózki magazynowe" items={categoryFaqItems} />
+      <FAQSchema items={categoryFaqItems} />
       
       <CallToAction />
     </Layout>

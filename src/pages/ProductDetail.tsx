@@ -14,6 +14,8 @@ import RelatedProducts from '@/components/products/RelatedProducts';
 import ProductSchema from '@/components/seo/ProductSchema';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
 import { Loader2 } from 'lucide-react';
+import FAQSection from '@/components/ui/FAQSection';
+import FAQSchema from '@/components/seo/FAQSchema';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -88,6 +90,25 @@ const ProductDetail = () => {
     return product.image || '';
   };
 
+  const productFaqItems = [
+    {
+      question: `Czy model ${product.model} może bezpiecznie poruszać się po nawierzchni z kostki brukowej?`,
+      answer: 'Tak, model nadaje się do jazdy po kostce brukowej.',
+    },
+    {
+      question: `Czy model ${product.model} może być użytkowany na powierzchniach kamienistych?`,
+      answer: 'Nie, ten typ wózka nie jest przystosowany do jazdy po kamieniach.',
+    },
+    {
+      question: `Czy wózek ${product.model} umożliwia rozładunek palet z naczepy TIR?`,
+      answer: 'Tak, ten wózek umożliwia rozładunek z TIR-a, zgodnie z zaleceniami producenta.',
+    },
+    {
+      question: 'Czy wózek może pracować w chłodni przez dłuższy czas?',
+      answer: 'Tak, pod warunkiem zastosowania odpowiedniego oleju hydraulicznego przeznaczonego do pracy w niskich temperaturach.',
+    },
+  ];
+
   return (
     <Layout>
       <Helmet>
@@ -130,6 +151,9 @@ const ProductDetail = () => {
           </div>
         </div>
       </section>
+
+      <FAQSection title={`FAQ – ${product.model}`} items={productFaqItems} />
+      <FAQSchema items={productFaqItems} />
       
       <RelatedProducts currentProductId={product.id} products={products} />
       

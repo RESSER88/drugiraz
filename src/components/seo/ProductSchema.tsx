@@ -98,9 +98,28 @@ const ProductSchema = ({ product }: ProductSchemaProps) => {
       });
     }
 
+    // Applications / Zastosowania
+    const applications = [
+      'Magazyny i centra dystrybucyjne',
+      'Zakłady produkcyjne',
+      'Handel detaliczny i supermarkety',
+      'Gospodarstwa rolne',
+      'Magazyny wysokiego składowania',
+      'Logistyka magazynowa',
+      'Zakłady przemysłowe',
+      'Hurtownie i hipermarkety'
+    ];
+
+    applications.forEach((app) => {
+      properties.push({
+        "@type": "PropertyValue",
+        "name": "Zastosowanie",
+        "value": app
+      });
+    });
+
     return properties;
   };
-
   const schema = {
     "@context": "https://schema.org/",
     "@type": "Product",
