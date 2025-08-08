@@ -14,6 +14,7 @@ import { Mail, X } from 'lucide-react';
 import { Product } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PriceInquiryModalProps {
   isOpen: boolean;
@@ -103,21 +104,51 @@ Pozdrawiam` : '';
     return messages[language] + polishVersion;
   };
 
-  const handleEmailRedirect = () => {
+  const handleEmailRedirect = async () => {
     const subject = encodeURIComponent(`${t('priceInquiry')} - ${product.model}`);
     const body = encodeURIComponent(generateEmailContent());
     const mailtoLink = `mailto:info@stakerpol.pl?subject=${subject}&body=${body}`;
-    
+
+    // Prepare lead payload
+    const isUuid = /^[0-9a-f-]{36}$/i.test(product.id);
+    const leadPayload = {
+      product_id: isUuid ? product.id : undefined,
+      product_model: product.model,
+      production_year: product.specs?.productionYear || null,
+      serial_number: product.specs?.serialNumber || null,
+      phone: phoneNumber || null,
+      language,
+      message: decodeURIComponent(body),
+      page_url: typeof window !== 'undefined' ? window.location.href : null,
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+    } as const;
+
+    try {
+      // Save to DB
+      const { data, error } = await supabase
+        .from('price_inquiries')
+        .insert(leadPayload as any)
+        .select('id')
+        .maybeSingle();
+
+      // Fire notification (email/webhook)
+      await supabase.functions.invoke('notify-lead', {
+        body: { ...leadPayload, id: data?.id },
+      });
+    } catch (e) {
+      console.warn('Lead save/notify failed (continuing with mailto):', e);
+    }
+
+    // Always open email client
     window.location.href = mailtoLink;
-    
+
     toast({
       title: t('success'),
       description: t('emailRedirectSuccess'),
     });
-    
+
     onClose();
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">

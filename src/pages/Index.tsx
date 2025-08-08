@@ -60,7 +60,7 @@ const Index = () => {
             className="secondary-button"
             asChild
           >
-            <Link to="/products">
+            <Link to={`/${language}/products`}>
               {t('viewAllProducts')}
             </Link>
           </Button>
@@ -103,14 +103,16 @@ const Index = () => {
         <meta property="og:title" content="Stakerpol - Wózki widłowe Toyota BT | Sprzedaż używanych wózków" />
         <meta property="og:description" content="Profesjonalna sprzedaż używanych wózków widłowych Toyota i BT. Elektryczne i spalinowe paleciaki magazynowe z serwisem." />
         <meta property="og:image" content="/lovable-uploads/cba7623d-e272-43d2-9cb1-c4864cb74fde.png" />
-        <meta property="og:url" content="https://stakerpol.pl" />
+        <meta property="og:url" content={`https://stakerpol.pl/${language}`} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Stakerpol - Wózki widłowe Toyota BT" />
         <meta name="twitter:description" content="Profesjonalna sprzedaż używanych wózków widłowych Toyota i BT. Elektryczne i spalinowe paleciaki magazynowe." />
         <meta name="twitter:image" content="/lovable-uploads/cba7623d-e272-43d2-9cb1-c4864cb74fde.png" />
-        <link rel="canonical" href="https://stakerpol.pl" />
+        <link rel="canonical" href={`https://stakerpol.pl/${language}`} />
         <meta name="keywords" content="wózki widłowe, toyota, bt, elektryczne, spalinowe, paleciaki, magazynowe, używane, serwis, stakerpol" />
+        {/* Preload hero image for faster LCP */}
+        <link rel="preload" as="image" href="/lovable-uploads/cba7623d-e272-43d2-9cb1-c4864cb74fde.png" />
       </Helmet>
       <LocalBusinessSchema />
       {/* Hero Section with Background Image */}
@@ -138,7 +140,7 @@ const Index = () => {
                   size="lg"
                   asChild
                 >
-                  <Link to="/products">
+                  <Link to={`/${language}/products`}>
                     {t('browseProducts')}
                   </Link>
                 </Button>
@@ -148,7 +150,7 @@ const Index = () => {
                   size="lg"
                   asChild
                 >
-                  <Link to="/contact">
+                  <Link to={`/${language}/contact`}>
                     {t('contact')}
                   </Link>
                 </Button>

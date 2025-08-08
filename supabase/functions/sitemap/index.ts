@@ -20,10 +20,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
-    // Fetch all products
+    // Fetch all products with their images
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, slug, name, updated_at')
+      .select('id, slug, updated_at, product_images(image_url)')
       .order('updated_at', { ascending: false });
 
     if (error) {
@@ -33,7 +33,7 @@ serve(async (req) => {
 
     console.log(`✅ Found ${products?.length || 0} products for sitemap`);
 
-    // Generate sitemap XML
+    // Generate sitemap XML with image:image
     const baseUrl = 'https://stakerpol.pl';
     const now = new Date().toISOString();
     
@@ -46,22 +46,24 @@ serve(async (req) => {
     ];
 
     // Product pages
-    const productPages = (products || []).map(product => ({
-      url: `/products/${(product as any).slug || product.id}`,
+    const productPages = (products || []).map((product: any) => ({
+      url: `/products/${product.slug || product.id}`,
       lastmod: product.updated_at || now,
       changefreq: 'weekly',
-      priority: '0.8'
+      priority: '0.8',
+      images: (product.product_images || []).map((img: any) => img.image_url).filter(Boolean)
     }));
 
     const allPages = [...staticPages, ...productPages];
 
     const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${allPages.map(page => `  <url>
     <loc>${baseUrl}${page.url}</loc>
     <lastmod>${page.lastmod}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
+    ${Array.isArray((page as any).images) ? (page as any).images.map((img: string) => `    <image:image><image:loc>${img.startsWith('http') ? img : baseUrl + img}</image:loc></image:image>`).join('\n') : ''}
   </url>`).join('\n')}
 </urlset>`;
 

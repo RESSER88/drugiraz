@@ -75,17 +75,19 @@ export const trackWebVitals = () => {
       }
     }).observe({ entryTypes: ['largest-contentful-paint'] });
 
-    // Track First Input Delay (FID)
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        const fidEntry = entry as any; // Type assertion for FID specific properties
-        if (fidEntry.processingStart) {
-          const fid = fidEntry.processingStart - entry.startTime;
-          console.log('FID:', fid);
-          sendToGA('FID', fid, fidEntry.id);
-        }
+    // Track Interaction to Next Paint (INP)
+    import('web-vitals').then(({ onINP }) => {
+      try {
+        onINP(({ value, id }) => {
+          console.log('INP:', value);
+          sendToGA('INP', value, id);
+        });
+      } catch (e) {
+        // no-op
       }
-    }).observe({ entryTypes: ['first-input'] });
+    }).catch(() => {
+      // no-op
+    });
 
     // Track Cumulative Layout Shift (CLS)
     let clsValue = 0;

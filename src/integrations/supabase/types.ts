@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      price_inquiries: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          message: string | null
+          page_url: string | null
+          phone: string | null
+          product_id: string | null
+          product_model: string
+          production_year: string | null
+          serial_number: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language: string
+          message?: string | null
+          page_url?: string | null
+          phone?: string | null
+          product_id?: string | null
+          product_model: string
+          production_year?: string | null
+          serial_number?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          message?: string | null
+          page_url?: string | null
+          phone?: string | null
+          product_id?: string | null
+          product_model?: string
+          production_year?: string | null
+          serial_number?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           alt_text: string | null
