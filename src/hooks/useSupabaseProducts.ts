@@ -122,6 +122,16 @@ export const useSupabaseProducts = () => {
         throw new Error('Numer seryjny jest wymagany');
       }
       
+      // Auth/session check to provide clearer errors before DB call
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error('Auth session retrieval error:', sessionError);
+      }
+      if (!session) {
+        throw new Error('Brak aktywnej sesji. Zaloguj się jako administrator i spróbuj ponownie.');
+      }
+      console.log('Current auth user for addProduct:', session.user?.id);
+
       const supabaseProduct = mapProductToSupabaseInsert(product);
       console.log('Mapped to Supabase format:', supabaseProduct);
       
@@ -178,9 +188,20 @@ export const useSupabaseProducts = () => {
     },
     onError: (error: any) => {
       console.error('Add product error:', error);
+      let description = error?.message || "Nie udało się dodać produktu do bazy danych";
+
+      const rawMsg = (error?.message || "").toLowerCase();
+      if (error?.name === 'TypeError' && /failed to fetch|networkerror/i.test(error?.message)) {
+        description = "Błąd sieci/CORS. Dodaj domenę aplikacji do Allowed CORS Origins w Supabase (Project Settings → API).";
+      } else if (/row level security|rls|permission denied|not authorized|policy/.test(rawMsg)) {
+        description = "Brak uprawnień (RLS). Upewnij się, że zalogowany użytkownik ma rolę admin oraz istnieją polityki INSERT dla tabel products i product_images.";
+      } else if (/jwt|token|session/.test(rawMsg)) {
+        description = "Sesja wygasła lub brak autoryzacji. Zaloguj się ponownie w panelu administratora.";
+      }
+
       toast({
         title: "❌ Błąd dodawania produktu",
-        description: error.message || "Nie udało się dodać produktu do bazy danych",
+        description,
         variant: "destructive",
         duration: 7000
       });
