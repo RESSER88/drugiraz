@@ -8,6 +8,24 @@ export type SupabaseProductUpdate = Database['public']['Tables']['products']['Up
 export type SupabaseProductImage = Database['public']['Tables']['product_images']['Row'];
 
 // Funkcje mapowania między typami aplikacji a Supabase
+
+// Prosta funkcja tworząca slug po stronie klienta (fallback, ostateczną unikalność zapewnia DB)
+const toSlug = (name: string, serial?: string) => {
+  const base = (name || '').toString()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '') // usuń diakrytyki
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  const sn = (serial || '')
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '');
+  return sn ? `${base}-${sn}` : base;
+};
+
 export const mapSupabaseProductToProduct = (supabaseProduct: SupabaseProduct, images: SupabaseProductImage[] = []) => {
   return {
     id: supabaseProduct.id,
@@ -64,7 +82,9 @@ export const mapProductToSupabaseInsert = (product: any): SupabaseProductInsert 
     foldable_platform: product.specs.operatorPlatform,
     additional_options: product.specs.additionalOptions,
     detailed_description: product.specs.additionalDescription,
-    image_url: product.images && product.images.length > 0 ? product.images[0] : product.image
+    image_url: product.images && product.images.length > 0 ? product.images[0] : product.image,
+    // dostarczamy slug po stronie klienta jako fallback; po stronie DB działa trigger zapewniający slug, jeśli nie podano
+    slug: product.slug?.toString() || toSlug(product.model, product.specs.serialNumber)
   };
 };
 
