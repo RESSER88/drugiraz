@@ -36,6 +36,9 @@ const Header = () => {
             <Link to="/testimonials" className="font-medium hover:text-toyota-orange transition-colors">
               {t('testimonials')}
             </Link>
+            <Link to="/faq" className="font-medium hover:text-toyota-orange transition-colors">
+              FAQ
+            </Link>
             <Link to="/contact" className="font-medium hover:text-toyota-orange transition-colors">
               {t('contact')}
             </Link>
@@ -85,6 +88,13 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('testimonials')}
+              </Link>
+              <Link 
+                to="/faq" 
+                className="font-medium py-2 hover:text-toyota-orange transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                FAQ
               </Link>
               <Link 
                 to="/contact" 

@@ -17,7 +17,10 @@ const LocalBusinessSchema = ({ includeOfferCatalog = true }: LocalBusinessSchema
     "address": {
       "@type": "PostalAddress",
       "addressCountry": "PL",
-      "addressRegion": "Wielkopolska"
+      "addressRegion": "Małopolskie",
+      "streetAddress": "ul. Międzyleśna 115",
+      "postalCode": "32-095",
+      "addressLocality": "Celiny"
     },
     "areaServed": {
       "@type": "Country",
@@ -31,6 +34,8 @@ const LocalBusinessSchema = ({ includeOfferCatalog = true }: LocalBusinessSchema
       "https://www.facebook.com/stakerpol",
       "https://www.instagram.com/stakerpol"
     ],
+    "hasMap": "https://www.google.com/maps?q=ul.+Mi%C4%99dzyle%C5%9Bna+115,+32-095+Celiny",
+
     "hasOfferCatalog": includeOfferCatalog ? {
       "@type": "OfferCatalog",
       "name": "Wózki widłowe BT Toyota",

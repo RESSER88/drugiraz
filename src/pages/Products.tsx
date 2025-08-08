@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { Shield, Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
-
+import { Helmet } from 'react-helmet-async';
 const Products = () => {
   const { language } = useLanguage();
   const t = useTranslation(language);
@@ -78,6 +78,16 @@ const Products = () => {
   ];
   return (
     <Layout>
+      <Helmet>
+        <title>Wózki widłowe BT Toyota – oferta | Stakerpol</title>
+        <meta name="description" content={getPageDescription()} />
+        <link rel="canonical" href="https://stakerpol.pl/products" />
+        <meta property="og:title" content="Wózki widłowe BT Toyota – oferta | Stakerpol" />
+        <meta property="og:description" content={getPageDescription()} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://stakerpol.pl/products" />
+        <meta name="twitter:card" content="summary" />
+      </Helmet>
       <section className="bg-gradient-to-b from-stakerpol-lightgray to-white py-12">
         <div className="container-custom">
           <div className="flex justify-between items-center mb-6">

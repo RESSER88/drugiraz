@@ -25,6 +25,7 @@ serve(async (req) => {
       .from('products')
       .select(`
         id,
+        slug,
         name,
         serial_number,
         short_description,
@@ -92,7 +93,7 @@ serve(async (req) => {
             "@type": "Product",
             "name": product.name,
             "description": product.short_description || product.detailed_description,
-            "url": `${baseUrl}/products/${product.id}`,
+            "url": `${baseUrl}/products/${product.slug || product.id}`,
             "image": images.length > 0 ? images : (product.image_url ? [{
               "@type": "ImageObject",
               "url": product.image_url,
