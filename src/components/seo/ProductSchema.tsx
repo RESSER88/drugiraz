@@ -9,7 +9,7 @@ const ProductSchema = ({ product }: ProductSchemaProps) => {
     if (typeof window !== 'undefined') {
       return window.location.href;
     }
-    return `https://stakerpol.pl/products/${product.id}`;
+    return `https://stakerpol.pl/products/${product.slug || product.id}`;
   };
 
   const getMainImage = () => {

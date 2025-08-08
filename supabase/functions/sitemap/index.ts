@@ -23,7 +23,7 @@ serve(async (req) => {
     // Fetch all products
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, updated_at')
+      .select('id, slug, name, updated_at')
       .order('updated_at', { ascending: false });
 
     if (error) {
@@ -47,7 +47,7 @@ serve(async (req) => {
 
     // Product pages
     const productPages = (products || []).map(product => ({
-      url: `/products/${product.id}`,
+      url: `/products/${(product as any).slug || product.id}`,
       lastmod: product.updated_at || now,
       changefreq: 'weekly',
       priority: '0.8'

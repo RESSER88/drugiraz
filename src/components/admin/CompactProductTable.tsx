@@ -98,7 +98,7 @@ const CompactProductTable = ({ products, onEdit, onCopy, onDelete }: CompactProd
                       <div className="space-y-1">
                         {/* Link do produktu - poprawiony z /product/ na /products/ */}
                         <Link 
-                          to={`/products/${product.id}`}
+                          to={`/products/${product.slug || product.id}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center group"
