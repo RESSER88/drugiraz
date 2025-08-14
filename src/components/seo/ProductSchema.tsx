@@ -1,4 +1,5 @@
 import { Product } from '@/types';
+import { testimonials } from '@/data/testimonials/testimonialsData';
 
 interface ProductSchemaProps {
   product: Product;
@@ -120,6 +121,42 @@ const ProductSchema = ({ product }: ProductSchemaProps) => {
 
     return properties;
   };
+
+  const getReviewsData = () => {
+    const reviews = testimonials.map((testimonial) => ({
+      "@type": "Review",
+      "author": {
+        "@type": "Person",
+        "name": testimonial.name
+      },
+      "reviewBody": testimonial.content,
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": testimonial.rating,
+        "bestRating": 5
+      },
+      "publisher": {
+        "@type": "Organization", 
+        "name": testimonial.company || "Stakerpol"
+      }
+    }));
+
+    const totalRating = testimonials.reduce((sum, t) => sum + t.rating, 0);
+    const averageRating = Math.round((totalRating / testimonials.length) * 10) / 10;
+
+    return {
+      reviews,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        "ratingValue": averageRating,
+        "reviewCount": testimonials.length,
+        "bestRating": 5,
+        "worstRating": 1
+      }
+    };
+  };
+
+  const reviewsData = getReviewsData();
   const schema = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -139,6 +176,8 @@ const ProductSchema = ({ product }: ProductSchemaProps) => {
     },
     "category": "Wózki widłowe",
     "additionalProperty": getAdditionalProperties(),
+    "review": reviewsData.reviews,
+    "aggregateRating": reviewsData.aggregateRating,
     "offers": {
       "@type": "Offer",
       "availability": "https://schema.org/InStock",
