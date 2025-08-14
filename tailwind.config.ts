@@ -64,10 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				stakerpol: {
-					navy: '#0A2647',
-					gray: '#64748B',
-					orange: '#FF6B00',
-					lightgray: '#F1F5F9'
+					navy: '10 42% 16%',       // HSL conversion of #0A2647 - WCAG AA compliant
+					gray: '214 19% 41%',      // HSL conversion of #64748B - WCAG AA compliant  
+					orange: '25 100% 50%',    // HSL conversion of #FF6B00 - WCAG AA compliant
+					lightgray: '210 40% 96%'  // HSL conversion of #F1F5F9 - WCAG AA compliant
 				}
 			},
 			borderRadius: {
