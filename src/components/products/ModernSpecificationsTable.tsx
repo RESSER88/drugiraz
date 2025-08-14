@@ -38,13 +38,7 @@ const ModernSpecificationsTable = ({ product, language }: ModernSpecificationsTa
   };
 
   const handleToggleSpecs = () => {
-    const newShowExtended = !showExtended;
-    setShowExtended(newShowExtended);
-    
-    // Auto-scroll to top when expanding specifications
-    if (newShowExtended) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    setShowExtended(!showExtended);
   };
 
   // Main specifications (always visible) - przywrócono liftHeight

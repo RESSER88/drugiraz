@@ -60,7 +60,7 @@ const Index = () => {
             className="secondary-button"
             asChild
           >
-            <Link to={`/${language}/products`}>
+            <Link to="/products">
               {t('viewAllProducts')}
             </Link>
           </Button>
@@ -140,9 +140,9 @@ const Index = () => {
                   size="lg"
                   asChild
                 >
-                  <Link to={`/${language}/products`}>
-                    {t('browseProducts')}
-                  </Link>
+            <Link to="/products">
+              {t('browseProducts')}
+            </Link>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -150,7 +150,7 @@ const Index = () => {
                   size="lg"
                   asChild
                 >
-                  <Link to={`/${language}/contact`}>
+                  <Link to="/contact">
                     {t('contact')}
                   </Link>
                 </Button>

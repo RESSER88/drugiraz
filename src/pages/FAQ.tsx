@@ -63,7 +63,7 @@ const FAQ: React.FC = () => {
               Zebraliśmy odpowiedzi na pytania, które najczęściej otrzymujemy od klientów.
             </p>
             <div className="mt-8">
-              <FAQSection items={faqItems} />
+              <FAQSection title="" items={faqItems} />
             </div>
           </div>
         </section>
