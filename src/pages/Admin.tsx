@@ -15,6 +15,7 @@ import { Product } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 import TranslationManager from '@/components/admin/TranslationManager';
+import { TranslationAutomation } from '@/components/admin/TranslationAutomation';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
@@ -206,7 +207,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
@@ -214,6 +215,10 @@ const Admin = () => {
             <TabsTrigger value="translations" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Tłumaczenia AI
+            </TabsTrigger>
+            <TabsTrigger value="automation" className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              Automat DeepL
             </TabsTrigger>
             <TabsTrigger value="images" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
@@ -249,6 +254,10 @@ const Admin = () => {
 
           <TabsContent value="translations">
             <TranslationManager />
+          </TabsContent>
+
+          <TabsContent value="automation">
+            <TranslationAutomation />
           </TabsContent>
 
           <TabsContent value="images">
