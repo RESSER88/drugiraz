@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -210,6 +210,81 @@ export type Database = {
           },
         ]
       }
+      translation_jobs: {
+        Row: {
+          characters_used: number | null
+          content_id: string
+          content_type: string
+          created_at: string
+          error_message: string | null
+          id: string
+          source_content: string
+          source_language: string
+          status: string
+          target_language: string
+          translated_content: string | null
+          updated_at: string
+        }
+        Insert: {
+          characters_used?: number | null
+          content_id: string
+          content_type: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          source_content: string
+          source_language?: string
+          status?: string
+          target_language: string
+          translated_content?: string | null
+          updated_at?: string
+        }
+        Update: {
+          characters_used?: number | null
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          source_content?: string
+          source_language?: string
+          status?: string
+          target_language?: string
+          translated_content?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      translation_stats: {
+        Row: {
+          api_calls: number | null
+          characters_limit: number | null
+          characters_used: number | null
+          created_at: string
+          id: string
+          month_year: string
+          updated_at: string
+        }
+        Insert: {
+          api_calls?: number | null
+          characters_limit?: number | null
+          characters_used?: number | null
+          created_at?: string
+          id?: string
+          month_year: string
+          updated_at?: string
+        }
+        Update: {
+          api_calls?: number | null
+          characters_limit?: number | null
+          characters_used?: number | null
+          created_at?: string
+          id?: string
+          month_year?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -250,26 +325,26 @@ export type Database = {
       }
       get_unposted_product: {
         Args:
+          | { auto_reset?: boolean; platform_name: string }
           | { platform_name: string }
-          | { platform_name: string; auto_reset?: boolean }
         Returns: Json
       }
       get_unposted_product_debug: {
-        Args: { platform_name: string; auto_reset?: boolean }
+        Args: { auto_reset?: boolean; platform_name: string }
         Returns: Json
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
       log_social_post: {
         Args: {
-          product_uuid: string
-          platform_name: string
           external_post_id?: string
+          platform_name: string
+          product_uuid: string
         }
         Returns: Json
       }
