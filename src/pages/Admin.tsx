@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
+import TranslationManager from '@/components/admin/TranslationManager';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
@@ -205,10 +206,14 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
+            </TabsTrigger>
+            <TabsTrigger value="translations" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Tłumaczenia AI
             </TabsTrigger>
             <TabsTrigger value="images" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
@@ -240,6 +245,10 @@ const Admin = () => {
               addProduct={addProduct}
               updateProduct={updateProduct}
             />
+          </TabsContent>
+
+          <TabsContent value="translations">
+            <TranslationManager />
           </TabsContent>
 
           <TabsContent value="images">
