@@ -1,7 +1,10 @@
 
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 import { Product } from '@/types';
 
 interface ProductFormProps {
@@ -10,31 +13,98 @@ interface ProductFormProps {
   onSpecsFieldChange: (field: string, value: string) => void;
 }
 
+interface ValidationErrors {
+  [key: string]: string;
+}
+
 const ProductForm = ({ product, onFieldChange, onSpecsFieldChange }: ProductFormProps) => {
+  const [errors, setErrors] = useState<ValidationErrors>({});
+
+  const validateField = (field: string, value: string, maxLength?: number): string => {
+    if (maxLength && value.length > maxLength) {
+      return `Maksymalnie ${maxLength} znaków (obecnie: ${value.length})`;
+    }
+    
+    // Check for HTML/script tags
+    const htmlRegex = /<[^>]*>/;
+    if (htmlRegex.test(value)) {
+      return 'HTML nie jest dozwolony w tym polu';
+    }
+    
+    return '';
+  };
+
+  const handleFieldChange = (field: string, value: string, maxLength?: number) => {
+    const error = validateField(field, value, maxLength);
+    setErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+    
+    onFieldChange(field, value);
+  };
+
+  const handleSpecsFieldChange = (field: string, value: string, maxLength?: number) => {
+    const error = validateField(field, value, maxLength);
+    setErrors(prev => ({
+      ...prev,
+      [`specs.${field}`]: error
+    }));
+    
+    onSpecsFieldChange(field, value);
+  };
+
+  const renderFieldError = (fieldName: string) => {
+    const error = errors[fieldName];
+    if (!error) return null;
+    
+    return (
+      <p className="text-sm text-destructive flex items-center gap-1 mt-1">
+        <AlertCircle className="h-3 w-3" />
+        {error}
+      </p>
+    );
+  };
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="space-y-4">
         <h3 className="font-semibold text-base sm:text-lg text-stakerpol-navy">Informacje podstawowe</h3>
         
         <div>
-          <label className="block text-sm font-medium mb-2">Model *</label>
+          <label className="block text-sm font-medium mb-2">
+            Model <span className="text-destructive">*</span>
+          </label>
           <Input 
             value={product.model} 
-            onChange={(e) => onFieldChange('model', e.target.value)} 
+            onChange={(e) => handleFieldChange('model', e.target.value, 100)}
             placeholder="np. BT Toyota SWE200D"
-            className="w-full"
+            className={`w-full ${errors.model ? 'border-destructive' : ''}`}
+            maxLength={100}
           />
+          {renderFieldError('model')}
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-2">Krótki opis</label>
+          <label className="block text-sm font-medium mb-2">
+            Krótki opis
+            <span className="text-sm font-normal text-muted-foreground ml-2">
+              (maks. 300 znaków)
+            </span>
+          </label>
           <Textarea 
             value={product.shortDescription} 
-            onChange={(e) => onFieldChange('shortDescription', e.target.value)}
+            onChange={(e) => handleFieldChange('shortDescription', e.target.value, 300)}
             placeholder="Krótki opis produktu dla klientów"
             rows={3}
-            className="w-full"
+            className={`w-full ${errors.shortDescription ? 'border-destructive' : ''}`}
+            maxLength={300}
           />
+          <div className="flex justify-between items-center mt-1">
+            {renderFieldError('shortDescription')}
+            <span className="text-xs text-muted-foreground">
+              {product.shortDescription.length}/300
+            </span>
+          </div>
         </div>
       </div>
       
@@ -208,14 +278,26 @@ const ProductForm = ({ product, onFieldChange, onSpecsFieldChange }: ProductForm
             </div>
             
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium mb-1">Opis dodatkowy</label>
+              <label className="block text-sm font-medium mb-1">
+                Opis dodatkowy
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  (maks. 1000 znaków)
+                </span>
+              </label>
               <Textarea 
                 value={product.specs.additionalDescription} 
-                onChange={(e) => onSpecsFieldChange('additionalDescription', e.target.value)} 
+                onChange={(e) => handleSpecsFieldChange('additionalDescription', e.target.value, 1000)}
                 placeholder="Szczegółowy opis dodatkowy produktu. Tekst będzie automatycznie dopasowywany do szerokości okna."
                 rows={4}
-                className="w-full"
+                className={`w-full ${errors['specs.additionalDescription'] ? 'border-destructive' : ''}`}
+                maxLength={1000}
               />
+              <div className="flex justify-between items-center mt-1">
+                {renderFieldError('specs.additionalDescription')}
+                <span className="text-xs text-muted-foreground">
+                  {(product.specs.additionalDescription || '').length}/1000
+                </span>
+              </div>
             </div>
           </div>
         </TabsContent>

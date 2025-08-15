@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, X } from 'lucide-react';
+import { Mail, AlertCircle, CheckCircle, Shield } from 'lucide-react';
 import { Product } from '@/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
@@ -27,6 +29,9 @@ const PriceInquiryModal = ({ isOpen, onClose, product }: PriceInquiryModalProps)
   const t = useTranslation(language);
   const { toast } = useToast();
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const generateEmailContent = () => {
     const productDetails = [
@@ -104,7 +109,40 @@ Pozdrawiam` : '';
     return messages[language] + polishVersion;
   };
 
+  const validatePhoneNumber = (phone: string): boolean => {
+    if (!phone.trim()) return true; // Optional field
+    
+    // Basic phone validation - allows +48 format, spaces, dashes
+    const phoneRegex = /^(\+\d{1,3}[-.\s]?)?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
+  };
+
+  const validateForm = (): boolean => {
+    setPhoneError('');
+
+    if (!privacyAccepted) {
+      toast({
+        title: t('validationError'),
+        description: t('privacyPolicyRequired'),
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (phoneNumber && !validatePhoneNumber(phoneNumber)) {
+      setPhoneError(t('phoneValidationError'));
+      return false;
+    }
+
+    return true;
+  };
+
   const handleEmailRedirect = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
     const subject = encodeURIComponent(`${t('priceInquiry')} - ${product.model}`);
     const body = encodeURIComponent(generateEmailContent());
     const mailtoLink = `mailto:info@stakerpol.pl?subject=${subject}&body=${body}`;
@@ -144,9 +182,11 @@ Pozdrawiam` : '';
 
     toast({
       title: t('success'),
-      description: t('emailRedirectSuccess'),
+      description: `${t('emailRedirectSuccess')} ${t('responseTime24h')}`,
+      variant: "default"
     });
 
+    setIsSubmitting(false);
     onClose();
   };
   return (
@@ -183,8 +223,37 @@ Pozdrawiam` : '';
               type="tel"
               placeholder={t('phoneNumberPlaceholder')}
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(e) => {
+                setPhoneNumber(e.target.value);
+                if (phoneError) setPhoneError('');
+              }}
+              className={phoneError ? 'border-destructive' : ''}
             />
+            {phoneError && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {phoneError}
+              </p>
+            )}
+          </div>
+
+          <Alert variant="info" className="border-blue-200">
+            <Shield className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              {t('privacyNotice')}
+            </AlertDescription>
+          </Alert>
+
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="privacy"
+              checked={privacyAccepted}
+              onCheckedChange={(checked) => setPrivacyAccepted(checked as boolean)}
+              className="mt-1"
+            />
+            <label htmlFor="privacy" className="text-sm leading-relaxed cursor-pointer">
+              {t('privacyPolicyAccept')} <span className="text-destructive">*</span>
+            </label>
           </div>
           
           <div className="bg-blue-50 p-4 rounded-lg">
@@ -196,14 +265,25 @@ Pozdrawiam` : '';
             <Button
               onClick={handleEmailRedirect}
               className="flex-1"
+              disabled={!privacyAccepted || isSubmitting}
             >
-              <Mail className="mr-2 h-4 w-4" />
-              {t('openEmailClient')}
+              {isSubmitting ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Wysyłanie...
+                </>
+              ) : (
+                <>
+                  <Mail className="mr-2 h-4 w-4" />
+                  {t('openEmailClient')}
+                </>
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
+              disabled={isSubmitting}
             >
               {t('cancel')}
             </Button>

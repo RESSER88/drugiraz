@@ -310,7 +310,28 @@ textarea:focus-visible,
 select:focus-visible {
   outline: 3px solid hsl(25 100% 50%);
   outline-offset: 2px;
-  box-shadow: 0 0 0 1px hsl(var(--background));
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsla(25, 100%, 50%, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced focus for form elements */
+input:focus-visible,
+textarea:focus-visible {
+  border-color: hsl(25 100% 50%);
+  background-color: hsl(var(--background));
+}
+
+/* Button focus improvements */
+button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsla(25, 100%, 50%, 0.3), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Link focus improvements */
+a:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 
 /* Skip to main content for screen readers */
@@ -365,4 +386,94 @@ select:focus-visible {
   .button-group {
     @apply gap-2;
   }
+}
+
+/* Form improvements */
+.form-field-wrapper {
+  @apply space-y-2;
+}
+
+.form-field-wrapper label {
+  @apply block text-sm font-medium text-foreground;
+}
+
+.form-field-wrapper input,
+.form-field-wrapper textarea {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.form-field-wrapper input:hover,
+.form-field-wrapper textarea:hover {
+  @apply border-muted-foreground/40;
+}
+
+/* Error states */
+.form-field-error {
+  @apply border-destructive bg-destructive/5;
+}
+
+.form-field-error:focus {
+  @apply ring-destructive/30;
+}
+
+/* Success states */
+.form-field-success {
+  @apply border-green-500 bg-green-50;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground))/10 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Improved modal and dialog spacing */
+.dialog-content {
+  @apply max-w-md mx-auto p-6 space-y-4;
+}
+
+.dialog-content .dialog-header {
+  @apply text-center space-y-2;
+}
+
+.dialog-content .dialog-footer {
+  @apply flex gap-2 pt-4;
+}
+
+/* Better button group layouts */
+.button-group-vertical {
+  @apply flex flex-col gap-3;
+}
+
+.button-group-horizontal {
+  @apply flex flex-row gap-2;
+}
+
+@media (min-width: 640px) {
+  .button-group-responsive {
+    @apply flex-row;
+  }
+}
+
+/* Enhanced accessibility for screen readers */
+.sr-only-focusable:focus {
+  @apply not-sr-only;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  padding: 1rem;
+  background: hsl(var(--background));
+  border: 2px solid hsl(var(--border));
+  border-radius: 0.5rem;
 }
