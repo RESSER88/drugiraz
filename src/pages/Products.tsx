@@ -11,10 +11,19 @@ import { Shield, Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
 import { Helmet } from 'react-helmet-async';
+import ProductFilter from '@/components/products/ProductFilter';
+import React, { useState } from 'react';
+import { Product } from '@/types';
 const Products = () => {
   const { language } = useLanguage();
   const t = useTranslation(language);
   const { products, isLoading } = usePublicSupabaseProducts();
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  
+  // Update filtered products when products load
+  React.useEffect(() => {
+    setFilteredProducts(products);
+  }, [products]);
 
   const getPageDescription = () => {
     switch (language) {
@@ -47,9 +56,11 @@ const Products = () => {
       return <ProductsEmptyState />;
     }
 
+    const displayProducts = filteredProducts.length > 0 ? filteredProducts : products;
+
     return (
       <div className="product-grid-desktop">
-        {products.map((product, index) => (
+        {displayProducts.map((product, index) => (
           <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
             <ProductCard product={product} />
           </div>
@@ -92,13 +103,19 @@ const Products = () => {
         <div className="container-custom">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-bold text-center animate-fade-in text-stakerpol-navy">{t('electricTrolleys')}</h1>
-            <Link 
-              to="/admin" 
-              className="flex items-center text-muted-foreground hover:text-stakerpol-orange transition-colors"
-              title="Panel administracyjny"
-            >
-              <Shield size={20} />
-            </Link>
+            <div className="flex items-center gap-4">
+              <ProductFilter 
+                products={products} 
+                onFilterChange={setFilteredProducts}
+              />
+              <Link 
+                to="/admin" 
+                className="flex items-center text-muted-foreground hover:text-stakerpol-orange transition-colors"
+                title="Panel administracyjny"
+              >
+                <Shield size={20} />
+              </Link>
+            </div>
           </div>
           
           <p className="text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-12 animate-fade-in">

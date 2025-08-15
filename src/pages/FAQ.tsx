@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Helmet } from 'react-helmet-async';
 import FAQSection, { FAQItem } from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
+import SearchInput from '@/components/ui/SearchInput';
 
 const FAQ: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const faqItems: FAQItem[] = [
     { question: 'Czy model Toyota SWE 200d może bezpiecznie poruszać się po nawierzchni z kostki brukowej?', answer: 'Tak, model nadaje się do jazdy po kostce.' },
     { question: 'Czy model SWE 200d może być użytkowany na powierzchniach kamienistych?', answer: 'Nie, nie jest przystosowany do jazdy po kamieniach.' },
@@ -43,6 +46,15 @@ const FAQ: React.FC = () => {
     { question: 'Co się dzieje przy niskim poziomie baterii?', answer: 'Włącza się sygnał ostrzegawczy, podnoszenie zostaje zablokowane.' },
   ];
 
+  const filteredFAQItems = useMemo(() => {
+    if (!searchTerm.trim()) return faqItems;
+    
+    return faqItems.filter(item => 
+      item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.answer.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, faqItems]);
+
   return (
     <Layout>
       <Helmet>
@@ -62,8 +74,26 @@ const FAQ: React.FC = () => {
             <p className="text-center text-muted-foreground max-w-2xl mx-auto mt-2">
               Zebraliśmy odpowiedzi na pytania, które najczęściej otrzymujemy od klientów.
             </p>
+            
+            <div className="mt-8 max-w-md mx-auto">
+              <SearchInput
+                value={searchTerm}
+                onChange={setSearchTerm}
+                placeholder="Szukaj w FAQ..."
+                className="w-full"
+              />
+            </div>
+            
             <div className="mt-8">
-              <FAQSection title="" items={faqItems} />
+              {filteredFAQItems.length > 0 ? (
+                <FAQSection title="" items={filteredFAQItems} />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">
+                    Brak wyników dla frazy "{searchTerm}". Spróbuj użyć innych słów kluczowych.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>

@@ -12,19 +12,19 @@ const WhyChooseUs = () => {
       icon: ShieldCheck,
       title: t('qualityGuaranteeTitle'),
       description: t('qualityGuaranteeDesc'),
-      color: "bg-stakerpol-orange"
+      color: "bg-primary"
     },
     {
       icon: CheckCircle,
       title: t('riskFreeTitle'), 
       description: t('riskFreeDesc'),
-      color: "bg-blue-600"
+      color: "bg-blue-500"
     },
     {
       icon: Award,
       title: t('experienceTitle'),
       description: t('experienceDesc'),
-      color: "bg-green-600"
+      color: "bg-green-500"
     }
   ];
 

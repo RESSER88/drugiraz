@@ -296,6 +296,54 @@
   animation: expand-text 0.3s ease-out;
 }
 
+/* Performance optimizations */
+.image-hover-zoom img {
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.image-hover-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* Improved focus states */
+.focus\:outline-none:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Enhanced button focus */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+/* Loading optimizations */
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .will-change-scroll {
+    will-change: scroll-position;
+  }
+}
+
+/* Optimize accordion animations */
+[data-state="open"] {
+  animation: accordion-down 0.2s ease-out;
+}
+
+[data-state="closed"] {
+  animation: accordion-up 0.2s ease-out;
+}
+
 /* WCAG 2.1 AA Focus States - Enhanced accessibility */
 *:focus {
   outline: 2px solid hsl(var(--ring));
