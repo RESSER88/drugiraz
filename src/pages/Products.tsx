@@ -104,10 +104,6 @@ const Products = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-bold text-center animate-fade-in text-stakerpol-navy">{t('electricTrolleys')}</h1>
             <div className="flex items-center gap-4">
-              <ProductFilter 
-                products={products} 
-                onFilterChange={setFilteredProducts}
-              />
               <Link 
                 to="/admin" 
                 className="flex items-center text-muted-foreground hover:text-stakerpol-orange transition-colors"
@@ -118,9 +114,16 @@ const Products = () => {
             </div>
           </div>
           
-          <p className="text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-12 animate-fade-in">
+          <p className="text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-8 animate-fade-in">
             {getPageDescription()}
           </p>
+          
+          <div className="flex justify-center mb-8">
+            <ProductFilter 
+              products={products} 
+              onFilterChange={setFilteredProducts}
+            />
+          </div>
           
           {renderContent()}
         </div>
