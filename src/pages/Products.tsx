@@ -1,13 +1,11 @@
 
 import Layout from '@/components/layout/Layout';
-import TranslatedProductCard from '@/components/ui/TranslatedProductCard';
+import ProductCard from '@/components/ui/ProductCard';
 import CallToAction from '@/components/ui/CallToAction';
 import ProductsEmptyState from '@/components/ui/ProductsEmptyState';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
 import { usePublicSupabaseProducts } from '@/hooks/usePublicSupabaseProducts';
-import { useProductTranslations } from '@/hooks/useProductTranslations';
-import { useDynamicTranslations } from '@/hooks/useDynamicTranslations';
 import { Link } from 'react-router-dom';
 import { Shield, Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
@@ -16,19 +14,16 @@ import { Helmet } from 'react-helmet-async';
 import ProductFilter from '@/components/products/ProductFilter';
 import React, { useState } from 'react';
 import { Product } from '@/types';
-import LanguageDebugger from '@/components/ui/LanguageDebugger';
 const Products = () => {
   const { language } = useLanguage();
   const t = useTranslation(language);
   const { products, isLoading } = usePublicSupabaseProducts();
-  const { translatedProducts } = useProductTranslations(products, language);
-  const { translations: dynamicTranslations } = useDynamicTranslations(language);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   
-  // Update filtered products when translated products load
+  // Update filtered products when products load
   React.useEffect(() => {
-    setFilteredProducts(translatedProducts);
-  }, [translatedProducts]);
+    setFilteredProducts(products);
+  }, [products]);
 
   const getPageDescription = () => {
     switch (language) {
@@ -61,13 +56,13 @@ const Products = () => {
       return <ProductsEmptyState />;
     }
 
-    const displayProducts = filteredProducts.length > 0 ? filteredProducts : translatedProducts;
+    const displayProducts = filteredProducts.length > 0 ? filteredProducts : products;
 
     return (
       <div className="product-grid-desktop">
         {displayProducts.map((product, index) => (
           <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
-            <TranslatedProductCard product={product} />
+            <ProductCard product={product} />
           </div>
         ))}
       </div>
@@ -125,7 +120,7 @@ const Products = () => {
           
           <div className="flex justify-center mb-8">
             <ProductFilter 
-              products={translatedProducts} 
+              products={products} 
               onFilterChange={setFilteredProducts}
             />
           </div>
@@ -133,14 +128,10 @@ const Products = () => {
           {renderContent()}
         </div>
       </section>
-      <FAQSection 
-        title="FAQ – wózki magazynowe" 
-        items={language === 'pl' || dynamicTranslations.faq.length === 0 ? categoryFaqItems : dynamicTranslations.faq.slice(0, 4)} 
-      />
+      <FAQSection title="FAQ – wózki magazynowe" items={categoryFaqItems} />
       <FAQSchema items={categoryFaqItems} />
       
       <CallToAction />
-      <LanguageDebugger />
     </Layout>
   );
 };

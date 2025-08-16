@@ -4,17 +4,11 @@ import { Helmet } from 'react-helmet-async';
 import FAQSection, { FAQItem } from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
 import SearchInput from '@/components/ui/SearchInput';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useDynamicTranslations } from '@/hooks/useDynamicTranslations';
-import { Loader2 } from 'lucide-react';
-import LanguageDebugger from '@/components/ui/LanguageDebugger';
 
 const FAQ: React.FC = () => {
-  const { language } = useLanguage();
-  const { translations, isLoading, error } = useDynamicTranslations(language);
   const [searchTerm, setSearchTerm] = useState('');
   
-  const defaultFaqItems: FAQItem[] = [
+  const faqItems: FAQItem[] = [
     { question: 'Czy model Toyota SWE 200d może bezpiecznie poruszać się po nawierzchni z kostki brukowej?', answer: 'Tak, model nadaje się do jazdy po kostce.' },
     { question: 'Czy model SWE 200d może być użytkowany na powierzchniach kamienistych?', answer: 'Nie, nie jest przystosowany do jazdy po kamieniach.' },
     { question: 'Czy wózek SWE 200d umożliwia rozładunek palet z naczepy TIR?', answer: 'Tak, umożliwia rozładunek z TIRa.' },
@@ -51,11 +45,6 @@ const FAQ: React.FC = () => {
     { question: 'Jak bezpiecznie ładować baterię wózka?', answer: 'Zaparkować, wyłączyć, wentylować, stosować środki ochrony.' },
     { question: 'Co się dzieje przy niskim poziomie baterii?', answer: 'Włącza się sygnał ostrzegawczy, podnoszenie zostaje zablokowane.' },
   ];
-
-  // Use translated FAQ items if available, otherwise use default
-  const faqItems = language === 'pl' || translations.faq.length === 0 
-    ? defaultFaqItems 
-    : translations.faq;
 
   const filteredFAQItems = useMemo(() => {
     if (!searchTerm.trim()) return faqItems;
@@ -96,22 +85,7 @@ const FAQ: React.FC = () => {
             </div>
             
             <div className="mt-8">
-              {isLoading ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-stakerpol-orange mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      {language === 'pl' ? 'Ładowanie FAQ...' : 'Loading translations...'}
-                    </p>
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="text-center py-8">
-                  <p className="text-red-600">
-                    Błąd ładowania tłumaczeń: {error}
-                  </p>
-                </div>
-              ) : filteredFAQItems.length > 0 ? (
+              {filteredFAQItems.length > 0 ? (
                 <FAQSection title="" items={filteredFAQItems} />
               ) : (
                 <div className="text-center py-8">
@@ -124,8 +98,7 @@ const FAQ: React.FC = () => {
           </div>
         </section>
       </main>
-      <LanguageDebugger />
-      <FAQSchema items={defaultFaqItems} />
+      <FAQSchema items={faqItems} />
     </Layout>
   );
 };
