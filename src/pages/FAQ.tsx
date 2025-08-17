@@ -4,11 +4,15 @@ import { Helmet } from 'react-helmet-async';
 import FAQSection, { FAQItem } from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
 import SearchInput from '@/components/ui/SearchInput';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useDynamicTranslations } from '@/hooks/useDynamicTranslations';
 
 const FAQ: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { language } = useLanguage();
+  const { getTranslation, loading } = useDynamicTranslations(language);
   
-  const faqItems: FAQItem[] = [
+  const baseFaqItems: FAQItem[] = [
     { question: 'Czy model Toyota SWE 200d może bezpiecznie poruszać się po nawierzchni z kostki brukowej?', answer: 'Tak, model nadaje się do jazdy po kostce.' },
     { question: 'Czy model SWE 200d może być użytkowany na powierzchniach kamienistych?', answer: 'Nie, nie jest przystosowany do jazdy po kamieniach.' },
     { question: 'Czy wózek SWE 200d umożliwia rozładunek palet z naczepy TIR?', answer: 'Tak, umożliwia rozładunek z TIRa.' },
@@ -45,6 +49,14 @@ const FAQ: React.FC = () => {
     { question: 'Jak bezpiecznie ładować baterię wózka?', answer: 'Zaparkować, wyłączyć, wentylować, stosować środki ochrony.' },
     { question: 'Co się dzieje przy niskim poziomie baterii?', answer: 'Włącza się sygnał ostrzegawczy, podnoszenie zostaje zablokowane.' },
   ];
+
+  // Translate FAQ items based on current language
+  const faqItems: FAQItem[] = useMemo(() => {
+    return baseFaqItems.map((item, index) => ({
+      question: getTranslation('faq', `question_${index}`, item.question),
+      answer: getTranslation('faq', `answer_${index}`, item.answer)
+    }));
+  }, [baseFaqItems, getTranslation, language]);
 
   const filteredFAQItems = useMemo(() => {
     if (!searchTerm.trim()) return faqItems;
