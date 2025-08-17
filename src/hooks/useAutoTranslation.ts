@@ -150,53 +150,6 @@ export const useAutoTranslation = () => {
     }
   };
 
-  const forceProcessAllPending = async () => {
-    setLoading(true);
-    try {
-      toast({
-        title: 'Uruchamianie force processing',
-        description: 'Przetwarzanie wszystkich oczekujących tłumaczeń...'
-      });
-
-      // Uruchom kilka rund przetwarzania
-      for (let i = 0; i < 5; i++) {
-        const { data, error } = await supabase.functions.invoke('auto-translate', {
-          body: { action: 'process_pending_translations' }
-        });
-
-        if (error) throw error;
-        
-        console.log(`Round ${i + 1}: Processed ${data.processed_count || 0} translations`);
-        
-        if (!data.success || data.processed_count === 0) {
-          break; // No more to process
-        }
-        
-        // Wait a bit between rounds
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
-      toast({
-        title: 'Force processing zakończony',
-        description: 'Sprawdź panel Translation Manager aby zobaczyć wyniki',
-        variant: 'default'
-      });
-
-      await loadStats();
-      await loadJobs();
-
-    } catch (error) {
-      console.error('Error in force processing:', error);
-      toast({
-        title: 'Błąd force processing',
-        description: error.message || 'Nie udało się przetworzyć wszystkich tłumaczeń',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const scheduleProductTranslation = async (productId: string, productContent: any) => {
     try {
       const { error } = await supabase.functions.invoke('schedule-translations', {
@@ -236,7 +189,6 @@ export const useAutoTranslation = () => {
     loading,
     setupInitialTranslations,
     processPendingTranslations,
-    forceProcessAllPending,
     scheduleProductTranslation,
     refreshData: () => {
       loadStats();

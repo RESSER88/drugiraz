@@ -6,8 +6,6 @@ import ProductsEmptyState from '@/components/ui/ProductsEmptyState';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
 import { usePublicSupabaseProducts } from '@/hooks/usePublicSupabaseProducts';
-import { useProductTranslations } from '@/hooks/useProductTranslations';
-import TranslatedProductCard from '@/components/ui/TranslatedProductCard';
 import { Link } from 'react-router-dom';
 import { Shield, Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
@@ -20,7 +18,6 @@ const Products = () => {
   const { language } = useLanguage();
   const t = useTranslation(language);
   const { products, isLoading } = usePublicSupabaseProducts();
-  const { getProductTranslation } = useProductTranslations(language);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   
   // Update filtered products when products load
@@ -65,7 +62,7 @@ const Products = () => {
       <div className="product-grid-desktop">
         {displayProducts.map((product, index) => (
           <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
-            <TranslatedProductCard product={product} />
+            <ProductCard product={product} />
           </div>
         ))}
       </div>

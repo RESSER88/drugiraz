@@ -13,7 +13,6 @@ const TranslationManager: React.FC = () => {
     loading,
     setupInitialTranslations,
     processPendingTranslations,
-    forceProcessAllPending,
     refreshData
   } = useAutoTranslation();
 
@@ -150,15 +149,6 @@ const TranslationManager: React.FC = () => {
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Przetwórz oczekujące ({stats?.pending_jobs || 0})
-            </Button>
-
-            <Button
-              onClick={forceProcessAllPending}
-              disabled={loading || stats?.pending_jobs === 0 || stats?.limit_reached}
-              variant="destructive"
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Force Processing (Wszystkie)
             </Button>
           </div>
 
