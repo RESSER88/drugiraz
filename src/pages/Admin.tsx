@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Package, Settings, Image, Users, BarChart3, Wrench, CheckCircle, AlertCircle, Upload, Globe } from 'lucide-react';
+import { Loader2, Package, Settings, Image, Users, BarChart3, Wrench, CheckCircle, AlertCircle, Upload, Globe, Target } from 'lucide-react';
 import AdminLogin from '@/components/admin/AdminLogin';
 import ProductManager from '@/components/admin/ProductManager';
 import ImageMigrationTool from '@/components/admin/ImageMigrationTool';
@@ -17,6 +17,7 @@ import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 import TranslationManager from '@/components/admin/TranslationManager';
 import { TranslationAutomation } from '@/components/admin/TranslationAutomation';
 import ZCTDashboard from '@/components/admin/ZCTDashboard';
+import ZCTStrategicDashboard from '@/components/admin/ZCTStrategicDashboard';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
@@ -208,14 +209,18 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
             </TabsTrigger>
+            <TabsTrigger value="zct-strategic" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              ZCT 2.0
+            </TabsTrigger>
             <TabsTrigger value="zct" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              ZCT
+              ZCT Diagnostyka
             </TabsTrigger>
             <TabsTrigger value="translations" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -255,6 +260,10 @@ const Admin = () => {
               addProduct={addProduct}
               updateProduct={updateProduct}
             />
+          </TabsContent>
+
+          <TabsContent value="zct-strategic">
+            <ZCTStrategicDashboard />
           </TabsContent>
 
           <TabsContent value="zct">
