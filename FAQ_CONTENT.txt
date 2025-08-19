@@ -1,0 +1,112 @@
+=== LISTA PYTAŃ I ODPOWIEDZI FAQ - STAKERPOL ===
+
+1. Pytanie: Czy model Toyota SWE 200d może bezpiecznie poruszać się po nawierzchni z kostki brukowej?
+   Odpowiedź: Tak, model nadaje się do jazdy po kostce.
+
+2. Pytanie: Czy model SWE 200d może być użytkowany na powierzchniach kamienistych?
+   Odpowiedź: Nie, nie jest przystosowany do jazdy po kamieniach.
+
+3. Pytanie: Czy wózek SWE 200d umożliwia rozładunek palet z naczepy TIR?
+   Odpowiedź: Tak, umożliwia rozładunek z TIRa.
+
+4. Pytanie: Czy paleciak może wjechać do komory chłodniczej?
+   Odpowiedź: Tak, może wjechać.
+
+5. Pytanie: Czy wózek może pracować w chłodni przez dłuższy czas?
+   Odpowiedź: Tak, jeśli zastosowano odpowiedni olej hydrauliczny.
+
+6. Pytanie: Czy SWE 200d przejedzie przez bramę o wysokości 1,90 m?
+   Odpowiedź: Tak, jego wysokość całkowita to 1,54 m.
+
+7. Pytanie: Czy wymagane jest oddzielne pomieszczenie do ładowania pojedynczego wózka?
+   Odpowiedź: Nie, nie jest wymagane.
+
+8. Pytanie: Czy do obsługi tego wózka potrzebne są uprawnienia?
+   Odpowiedź: Tak, wymagane są uprawnienia UDT.
+
+9. Pytanie: Czy wózek z masztem musi przechodzić obowiązkowy przegląd UDT?
+   Odpowiedź: Tak, wymagany jest ważny przegląd.
+
+10. Pytanie: Na jak długo UDT wydaje decyzję eksploatacyjną dla wózka?
+    Odpowiedź: Bez podestu – 24 miesiące, z podestem – 12 miesięcy.
+
+11. Pytanie: Czy używane wózki są objęte gwarancją?
+    Odpowiedź: Tak, gwarancja wynosi 3 miesiące.
+
+12. Pytanie: W jaki sposób należy ładować akumulator wózka?
+    Odpowiedź: Za pomocą dołączonego prostownika.
+
+13. Pytanie: Czy możliwe jest przetestowanie wózka przed zakupem?
+    Odpowiedź: Tak, można obejrzeć i przetestować wózek.
+
+14. Pytanie: Jakie są dostępne formy dostawy wózka?
+    Odpowiedź: Możliwy odbiór osobisty lub wysyłka kurierska.
+
+15. Pytanie: Czy oferowane wózki używane przechodzą przegląd techniczny?
+    Odpowiedź: Tak, każdy wózek jest sprawdzany technicznie.
+
+16. Pytanie: Jak sprawdzany jest stan baterii w wózku elektrycznym?
+    Odpowiedź: Poprzez diagnostykę, testy i pomiar parametrów elektrolitu.
+
+17. Pytanie: Czy oferujecie serwis wózków po zakończeniu gwarancji?
+    Odpowiedź: Tak, świadczymy serwis pogwarancyjny.
+
+18. Pytanie: Czy posiadacie autoryzację do konserwacji wózków widłowych?
+    Odpowiedź: Tak, posiadamy odpowiednie uprawnienia.
+
+19. Pytanie: Na czym polega funkcja 'creep to creep'?
+    Odpowiedź: Funkcja umożliwia precyzyjne manewrowanie z niską prędkością.
+
+20. Pytanie: Co oznacza kod błędu 2.001?
+    Odpowiedź: Kod oznacza, że jest wciśnięty przycisk „grzybek" bezpieczeństwa.
+
+21. Pytanie: Co oznacza kod błędu E50?
+    Odpowiedź: Kod oznacza, że jest wciśnięty przycisk „grzybek" bezpieczeństwa.
+
+22. Pytanie: W jakim stanie są koła i rolki w oferowanych wózkach?
+    Odpowiedź: Są nowe lub mają niewielki stopień zużycia.
+
+23. Pytanie: Jakie materiały są stosowane w kołach wózków?
+    Odpowiedź: Najczęściej poliuretan – cichy, trwały, nie zostawia śladów.
+
+24. Pytanie: Dlaczego paleciak nie podnosi ładunku i co zrobić?
+    Odpowiedź: Sprawdź poziom baterii, wagę ładunku i skontaktuj się z serwisem.
+
+25. Pytanie: W jakich warunkach najlepiej sprawdzą się wózki BT SWE?
+    Odpowiedź: Wewnątrz i na zewnątrz, na równych powierzchniach, do załadunku/rozładunku.
+
+26. Pytanie: Jak dobrać długość wideł do europalet?
+    Odpowiedź: Standardowa długość 1150 mm pasuje do europalet.
+
+27. Pytanie: Jak długo ładuje się bateria wózka?
+    Odpowiedź: Pełne ładowanie trwa 6–8 godzin w zależności od modelu.
+
+28. Pytanie: Na czym polega kompleksowe sprawdzenie baterii?
+    Odpowiedź: Obejmuje testy obciążeniowe i kontrolę stanu elektrolitu.
+
+29. Pytanie: Jak przebiega proces regeneracji baterii?
+    Odpowiedź: Diagnostyka, czyszczenie, wymiany, testy wydajnościowe.
+
+30. Pytanie: Czy oferujecie możliwość leasingu wózków?
+    Odpowiedź: Tak, umożliwiamy leasing na atrakcyjnych warunkach.
+
+31. Pytanie: Czy zapewniacie transport zakupionych wózków?
+    Odpowiedź: Tak, dostarczamy wózek bezpiecznie pod wskazany adres.
+
+32. Pytanie: Jak można sprawdzić stan używanego wózka?
+    Odpowiedź: Każdy paleciak ma przegląd, zapraszamy na jazdę próbną.
+
+33. Pytanie: Jakie modele Toyota BT posiadacie w ofercie?
+    Odpowiedź: SWE120L, SWE140L, SWE200D – wersje z podestem i bez.
+
+34. Pytanie: Jak bezpiecznie ładować baterię wózka?
+    Odpowiedź: Zaparkować, wyłączyć, wentylować, stosować środki ochrony.
+
+35. Pytanie: Co się dzieje przy niskim poziomie baterii?
+    Odpowiedź: Włącza się sygnał ostrzegawczy, podnoszenie zostaje zablokowane.
+
+=== KONIEC LISTY FAQ ===
+
+Łącznie: 35 pytań i odpowiedzi
+Format: Gotowy do kopiowania i edycji
+Data: 2024-08-19
