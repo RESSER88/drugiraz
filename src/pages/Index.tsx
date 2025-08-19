@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
 import { getRandomItems } from '@/utils/randomUtils';
 import { useMemo } from 'react';
+import { useDynamicTranslations } from '@/hooks/useDynamicTranslations';
 import { Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
@@ -69,32 +70,55 @@ const Index = () => {
     );
   };
 
-  const homeFaqItems = [
-    {
-      question: 'Czy używane wózki są objęte gwarancją?',
-      answer: 'Tak, gwarancja wynosi 3 miesiące na używane wózki – szczegóły zależą od konkretnego egzemplarza.',
-    },
-    {
-      question: 'Czy zapewniacie transport zakupionych wózków?',
-      answer: 'Tak, dostarczamy wózek bezpiecznie pod wskazany adres na terenie Polski – koszt zależy od odległości i parametrów.',
-    },
-    {
-      question: 'Czy oferujecie możliwość leasingu wózków?',
-      answer: 'Tak, umożliwiamy leasing na atrakcyjnych warunkach – skontaktuj się z nami po szczegóły.',
-    },
-    {
-      question: 'W jakich warunkach najlepiej sprawdzą się wózki BT SWE?',
-      answer: 'Najlepiej sprawdzają się wewnątrz i na równych powierzchniach, do załadunku i rozładunku oraz prac magazynowych.',
-    },
-    {
-      question: 'Jakie modele Toyota BT posiadacie w ofercie?',
-      answer: 'Najczęściej dostępne: SWE120L, SWE140L, SWE200D – w wersjach z podestem oraz bez podestu.',
-    },
-    {
-      question: 'Jak można sprawdzić stan używanego wózka?',
-      answer: 'Każdy wózek przechodzi przegląd. Zapraszamy do obejrzenia i jazdy próbnej przed zakupem.',
-    },
-  ];
+  // Use dynamic translations with fallback to static data
+  const { getAllFAQItems, hasTranslations } = useDynamicTranslations();
+  
+  const dynamicHomeFaqItems = useMemo(() => {
+    if (hasTranslations) {
+      const dynamicItems = getAllFAQItems(language);
+      // Filter for homepage-relevant FAQ items
+      const homepageRelevantItems = dynamicItems.filter(item => 
+        item.question.toLowerCase().includes('gwar') ||
+        item.question.toLowerCase().includes('transport') ||
+        item.question.toLowerCase().includes('leasing') ||
+        item.question.toLowerCase().includes('bt swe') ||
+        item.question.toLowerCase().includes('toyota') ||
+        item.question.toLowerCase().includes('stan')
+      ).slice(0, 6);
+      
+      if (homepageRelevantItems.length > 0) {
+        return homepageRelevantItems;
+      }
+    }
+    
+    // Fallback to static data
+    return [
+      {
+        question: 'Czy używane wózki są objęte gwarancją?',
+        answer: 'Tak, gwarancja wynosi 3 miesiące na używane wózki – szczegóły zależą od konkretnego egzemplarza.',
+      },
+      {
+        question: 'Czy zapewniacie transport zakupionych wózków?',
+        answer: 'Tak, dostarczamy wózek bezpiecznie pod wskazany adres na terenie Polski – koszt zależy od odległości i parametrów.',
+      },
+      {
+        question: 'Czy oferujecie możliwość leasingu wózków?',
+        answer: 'Tak, umożliwiamy leasing na atrakcyjnych warunkach – skontaktuj się z nami po szczegóły.',
+      },
+      {
+        question: 'W jakich warunkach najlepiej sprawdzą się wózki BT SWE?',
+        answer: 'Najlepiej sprawdzają się wewnątrz i na równych powierzchniach, do załadunku i rozładunku oraz prac magazynowych.',
+      },
+      {
+        question: 'Jakie modele Toyota BT posiadacie w ofercie?',
+        answer: 'Najczęściej dostępne: SWE120L, SWE140L, SWE200D – w wersjach z podestem oraz bez podestu.',
+      },
+      {
+        question: 'Jak można sprawdzić stan używanego wózka?',
+        answer: 'Każdy wózek przechodzi przegląd. Zapraszamy do obejrzenia i jazdy próbnej przed zakupem.',
+      },
+    ];
+  }, [language, hasTranslations, getAllFAQItems]);
   return (
     <Layout>
       <Helmet>
@@ -185,8 +209,8 @@ const Index = () => {
         </div>
       </section>
 
-      <FAQSection title="Najczęstsze pytania (FAQ)" items={homeFaqItems} />
-      <FAQSchema items={homeFaqItems} />
+      <FAQSection title="Najczęstsze pytania (FAQ)" items={dynamicHomeFaqItems} />
+      <FAQSchema items={dynamicHomeFaqItems} />
 
       <CallToAction />
     </Layout>

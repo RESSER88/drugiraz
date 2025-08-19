@@ -12,7 +12,8 @@ import FAQSection from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
 import { Helmet } from 'react-helmet-async';
 import ProductFilter from '@/components/products/ProductFilter';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useDynamicTranslations } from '@/hooks/useDynamicTranslations';
 import { Product } from '@/types';
 const Products = () => {
   const { language } = useLanguage();
@@ -69,24 +70,45 @@ const Products = () => {
     );
   };
 
-  const categoryFaqItems = [
-    {
-      question: 'W jakich warunkach najlepiej sprawdzą się wózki BT SWE?',
-      answer: 'Najlepiej wewnątrz i na równych powierzchniach; świetnie nadają się do prac magazynowych, załadunku i rozładunku.',
-    },
-    {
-      question: 'Jak dobrać długość wideł do europalet?',
-      answer: 'Standardowa długość 1150 mm pasuje do większości europalet. Dłuższe widły stosuje się do niestandardowych ładunków.',
-    },
-    {
-      question: 'Czy zapewniacie transport zakupionych wózków?',
-      answer: 'Tak, organizujemy bezpieczny transport na terenie kraju. Koszt zależy od odległości i parametrów wózka.',
-    },
-    {
-      question: 'Jak bezpiecznie ładować baterię wózka?',
-      answer: 'Zaparkować, wyłączyć wózek, zapewnić wentylację i używać dedykowanego prostownika oraz środków ochrony.',
-    },
-  ];
+  // Use dynamic translations with fallback to static data
+  const { getAllFAQItems, hasTranslations } = useDynamicTranslations();
+  
+  const categoryFaqItems = useMemo(() => {
+    if (hasTranslations) {
+      const dynamicItems = getAllFAQItems(language);
+      // Filter for product-relevant FAQ items
+      const productRelevantItems = dynamicItems.filter(item => 
+        item.question.toLowerCase().includes('bt swe') ||
+        item.question.toLowerCase().includes('widł') ||
+        item.question.toLowerCase().includes('transport') ||
+        item.question.toLowerCase().includes('bater')
+      ).slice(0, 4);
+      
+      if (productRelevantItems.length > 0) {
+        return productRelevantItems;
+      }
+    }
+    
+    // Fallback to static data
+    return [
+      {
+        question: 'W jakich warunkach najlepiej sprawdzą się wózki BT SWE?',
+        answer: 'Najlepiej wewnątrz i na równych powierzchniach; świetnie nadają się do prac magazynowych, załadunku i rozładunku.',
+      },
+      {
+        question: 'Jak dobrać długość wideł do europalet?',
+        answer: 'Standardowa długość 1150 mm pasuje do większości europalet. Dłuższe widły stosuje się do niestandardowych ładunków.',
+      },
+      {
+        question: 'Czy zapewniacie transport zakupionych wózków?',
+        answer: 'Tak, organizujemy bezpieczny transport na terenie kraju. Koszt zależy od odległości i parametrów wózka.',
+      },
+      {
+        question: 'Jak bezpiecznie ładować baterię wózka?',
+        answer: 'Zaparkować, wyłączyć wózek, zapewnić wentylację i używać dedykowanego prostownika oraz środków ochrony.',
+      },
+    ];
+  }, [language, hasTranslations, getAllFAQItems]);
   return (
     <Layout>
       <Helmet>

@@ -110,7 +110,7 @@ const ModernSpecificationsTable = ({ product, language }: ModernSpecificationsTa
             <Button
               variant="outline"
               onClick={handleToggleSpecs}
-              className="flex items-center gap-2 text-stakerpol-navy border-stakerpol-navy hover:bg-stakerpol-navy hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 text-stakerpol-navy border-stakerpol-navy hover:bg-stakerpol-navy hover:text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {showExtended ? (
                 <>
