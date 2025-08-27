@@ -9,6 +9,12 @@ interface TranslationStats {
   api_calls: number;
   pending_jobs: number;
   limit_reached: boolean;
+  translation_progress?: {
+    [language: string]: {
+      translated_products: number;
+      total_products: number;
+    };
+  };
 }
 
 interface TranslationJob {

@@ -265,6 +265,74 @@ serve(async (req) => {
         });
       }
 
+      case 'translate_product_fields': {
+        console.log('Processing product fields translation...');
+        
+        const { product_id, product_data } = params;
+        
+        if (!await checkMonthlyLimit()) {
+          throw new Error('Monthly translation limit exceeded');
+        }
+
+        const targetLanguages = ['en', 'cs', 'sk', 'de'];
+        const fieldsToTranslate = [
+          'short_description', 'initial_lift', 'condition', 'drive_type', 
+          'mast', 'wheels', 'foldable_platform', 'additional_options', 'detailed_description'
+        ];
+
+        let totalCharacters = 0;
+        const results = [];
+
+        for (const lang of targetLanguages) {
+          console.log(`Translating product ${product_id} fields to ${lang}...`);
+          
+          for (const fieldName of fieldsToTranslate) {
+            const sourceText = product_data[fieldName];
+            if (!sourceText || sourceText.trim() === '') continue;
+
+            try {
+              const translated = await translateText(sourceText, lang);
+              totalCharacters += sourceText.length;
+
+              // Zapisz tłumaczenie do tabeli product_translations
+              const { error } = await supabase
+                .from('product_translations')
+                .upsert({
+                  product_id,
+                  language: lang,
+                  field_name: fieldName,
+                  translated_value: translated
+                });
+
+              if (error) {
+                console.error(`Error saving translation for ${fieldName}:`, error);
+              } else {
+                results.push({ product_id, language: lang, field_name: fieldName, status: 'completed' });
+              }
+
+              // Małe opóźnienie między żądaniami
+              await new Promise(resolve => setTimeout(resolve, 100));
+
+            } catch (error) {
+              console.error(`Error translating ${fieldName} to ${lang}:`, error);
+              results.push({ product_id, language: lang, field_name: fieldName, status: 'failed', error: error.message });
+            }
+          }
+        }
+
+        if (totalCharacters > 0) {
+          await updateMonthlyStats(totalCharacters);
+        }
+
+        return new Response(JSON.stringify({ 
+          success: true,
+          results,
+          characters_used: totalCharacters 
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       case 'get_stats': {
         const currentMonth = new Date().toISOString().slice(0, 7);
         
@@ -279,13 +347,34 @@ serve(async (req) => {
           .select('id', { count: 'exact' })
           .eq('status', 'pending');
 
+        // Policz przetłumaczone pola produktów per język
+        const translationProgress = {};
+        const languages = ['en', 'cs', 'sk', 'de'];
+        
+        for (const lang of languages) {
+          const { data: translatedFields } = await supabase
+            .from('product_translations')
+            .select('product_id', { count: 'exact' })
+            .eq('language', lang);
+          
+          const { data: totalProducts } = await supabase
+            .from('products')
+            .select('id', { count: 'exact' });
+          
+          translationProgress[lang] = {
+            translated_products: translatedFields?.length || 0,
+            total_products: totalProducts?.length || 0
+          };
+        }
+
         return new Response(JSON.stringify({
           current_month: currentMonth,
           characters_used: stats?.characters_used || 0,
           characters_limit: stats?.characters_limit || 500000,
           api_calls: stats?.api_calls || 0,
           pending_jobs: pendingCount?.length || 0,
-          limit_reached: stats ? stats.characters_used >= stats.characters_limit : false
+          limit_reached: stats ? stats.characters_used >= stats.characters_limit : false,
+          translation_progress: translationProgress
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });

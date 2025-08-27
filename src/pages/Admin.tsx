@@ -6,15 +6,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Package, Settings, Image, Users, BarChart3, Wrench, CheckCircle, AlertCircle, Upload } from 'lucide-react';
+import { Loader2, Package, Settings, BarChart3, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import AdminLogin from '@/components/admin/AdminLogin';
 import ProductManager from '@/components/admin/ProductManager';
-import ImageMigrationTool from '@/components/admin/ImageMigrationTool';
 import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
-import TranslationManager from '@/components/admin/TranslationManager';
+import TranslationStatsPanel from '@/components/admin/TranslationStatsPanel';
+import ImageStatusTable from '@/components/admin/ImageStatusTable';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
@@ -33,6 +33,9 @@ const Admin = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [productImages, setProductImages] = useState<string[]>([]);
+  
+  // Translation stats panel state
+  const [isTranslationStatsOpen, setIsTranslationStatsOpen] = useState(false);
   
   const { toast } = useToast();
 
@@ -206,18 +209,10 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
-            </TabsTrigger>
-            <TabsTrigger value="translations" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Tłumaczenia AI
-            </TabsTrigger>
-            <TabsTrigger value="images" className="flex items-center gap-2">
-              <Image className="h-4 w-4" />
-              Migracja zdjęć
             </TabsTrigger>
             <TabsTrigger value="stats" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -247,72 +242,6 @@ const Admin = () => {
             />
           </TabsContent>
 
-          <TabsContent value="translations">
-            <TranslationManager />
-          </TabsContent>
-
-          <TabsContent value="images">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Image className="h-5 w-5" />
-                    Status obrazów
-                  </CardTitle>
-                  <CardDescription>
-                    Aktualne statystyki przechowywania obrazów produktów
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-stakerpol-navy">{migrationStats.totalImages}</div>
-                      <div className="text-sm text-gray-600">Obrazów ogółem</div>
-                    </div>
-                    <div className="text-center p-4 bg-orange-50 rounded-lg">
-                      <div className="text-2xl font-bold text-orange-600">{migrationStats.base64Images}</div>
-                      <div className="text-sm text-gray-600">Obrazów base64</div>
-                    </div>
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{migrationStats.storageImages}</div>
-                      <div className="text-sm text-gray-600">W Storage</div>
-                    </div>
-                  </div>
-                  
-                  {migrationStats.base64Images > 0 && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Wrench className="h-4 w-4 text-yellow-600" />
-                        <span className="font-semibold text-yellow-800">
-                          Migracja w toku
-                        </span>
-                      </div>
-                      <p className="text-sm text-yellow-700">
-                        Znaleziono {migrationStats.base64Images} obrazów do migracji. 
-                        Kliknij "Dokończ migrację" aby przenieść je do Supabase Storage.
-                      </p>
-                    </div>
-                  )}
-
-                  {migrationStats.isCompleted && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="font-semibold text-green-800">
-                          Wszystkie obrazy są już w Supabase Storage!
-                        </span>
-                      </div>
-                      <p className="text-sm text-green-700">
-                        Migracja została ukończona. Wszystkie obrazy są teraz serwowane z CDN.
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <ImageMigrationTool />
-            </div>
-          </TabsContent>
 
           <TabsContent value="stats">
             <div className="grid gap-6 md:grid-cols-2">
@@ -353,37 +282,53 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ustawienia systemu</CardTitle>
-                <CardDescription>
-                  Konfiguracja i zarządzanie systemem
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-semibold">Supabase Storage</h3>
-                      <p className="text-sm text-gray-600">
-                        Bucket 'product-images' skonfigurowany
-                      </p>
+            <div className="space-y-6">
+              {/* Image Status and Migration */}
+              <ImageStatusTable 
+                products={products || []}
+                isMonitoring={isMonitoring}
+                completeMigration={completeMigration}
+              />
+
+              {/* Translation Stats Panel */}
+              <TranslationStatsPanel 
+                isOpen={isTranslationStatsOpen}
+                onOpenChange={setIsTranslationStatsOpen}
+              />
+
+              {/* System Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Ustawienia systemu</CardTitle>
+                  <CardDescription>
+                    Konfiguracja podstawowych usług
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h3 className="font-semibold">Supabase Storage</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Bucket 'product-images' skonfigurowany
+                        </p>
+                      </div>
+                      <Badge variant="default">Aktywny</Badge>
                     </div>
-                    <Badge variant="default">Aktywny</Badge>
-                  </div>
-                  
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-semibold">Realtime Sync</h3>
-                      <p className="text-sm text-gray-600">
-                        Synchronizacja w czasie rzeczywistym
-                      </p>
+                    
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div>
+                        <h3 className="font-semibold">Realtime Sync</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Synchronizacja w czasie rzeczywistym
+                        </p>
+                      </div>
+                      <Badge variant="default">Włączony</Badge>
                     </div>
-                    <Badge variant="default">Włączony</Badge>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

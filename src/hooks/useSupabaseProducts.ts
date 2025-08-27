@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/types';
 import { useEffect } from 'react';
+import { useProductTranslations } from './useProductTranslations';
 import { 
   mapSupabaseProductToProduct,
   mapProductToSupabaseInsert,
@@ -15,6 +16,7 @@ import {
 export const useSupabaseProducts = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { translateProductFields } = useProductTranslations();
 
   // Enhanced product fetching with better error handling
   const { data: products = [], isLoading, error } = useQuery({
@@ -170,6 +172,11 @@ export const useSupabaseProducts = () => {
         }
       }
 
+      // Trigger automatic translation in background
+      if (newProduct) {
+        translateProductFields(newProduct.id, product);
+      }
+
       const endTime = performance.now();
       console.log(`=== PRODUCT ADDED in ${(endTime - startTime).toFixed(2)}ms ===`);
       
@@ -271,6 +278,9 @@ export const useSupabaseProducts = () => {
           console.log('Images updated successfully');
         }
       }
+
+      // Trigger automatic translation in background
+      translateProductFields(product.id, product);
 
       const endTime = performance.now();
       console.log(`=== PRODUCT UPDATED in ${(endTime - startTime).toFixed(2)}ms ===`);
