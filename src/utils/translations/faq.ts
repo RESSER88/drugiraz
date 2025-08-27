@@ -680,5 +680,77 @@ export const faqTranslations: Translations = {
     en: 'We have collected answers to the questions we receive most frequently from our customers.',
     cs: 'Shromáždili jsme odpovědi na otázky, které nejčastěji dostáváme od našich zákazníků.',
     sk: 'Zhromaždili sme odpovede na otázky, ktoré najčastejšie dostávame od našich zákazníkov.'
+  },
+  
+  // Product-specific FAQ translations
+  product_faq_surface_question: {
+    pl: 'Czy model {model} może być użytkowany na powierzchniach kamienistych?',
+    de: 'Kann das Modell {model} auf steinigen Oberflächen verwendet werden?',
+    en: 'Can the {model} model be used on rocky surfaces?',
+    cs: 'Lze model {model} používat na kamenitých površích?',
+    sk: 'Možno model {model} používať na kamenitých površiach?'
+  },
+  product_faq_surface_answer: {
+    pl: 'Nie, nie jest przystosowany do jazdy po kamieniach.',
+    de: 'Nein, es ist nicht für das Fahren auf Steinen geeignet.',
+    en: 'No, it is not adapted for driving on stones.',
+    cs: 'Ne, není přizpůsoben pro jízdu po kamenech.',
+    sk: 'Nie, nie je prispôsobený na jazdu po kameňoch.'
+  },
+  product_faq_truck_question: {
+    pl: 'Czy wózek {model} umożliwia rozładunek palet z naczepy TIR?',
+    de: 'Ermöglicht der {model} Stapler das Entladen von Paletten aus einem LKW-Auflieger?',
+    en: 'Does the {model} stacker enable unloading pallets from a truck trailer?',
+    cs: 'Umožňuje vozík {model} vykládku palet z návěsu TIR?',
+    sk: 'Umožňuje vozík {model} vykladanie paliet z návesa TIR?'
+  },
+  product_faq_truck_answer: {
+    pl: 'Tak, umożliwia rozładunek z TIRa.',
+    de: 'Ja, es ermöglicht das Entladen aus dem LKW.',
+    en: 'Yes, it enables unloading from the truck.',
+    cs: 'Ano, umožňuje vykládku z TIRu.',
+    sk: 'Áno, umožňuje vykladanie z TIRu.'
+  },
+  product_faq_cold_question: {
+    pl: 'Czy paleciak może wjechać do komory chłodniczej?',
+    de: 'Kann der Stapler in eine Kühlkammer fahren?',
+    en: 'Can the stacker enter a cold storage chamber?',
+    cs: 'Může vozík vjet do chladírenské komory?',
+    sk: 'Môže vozík vísť do chladiarenské komory?'
+  },
+  product_faq_cold_answer: {
+    pl: 'Tak, może wjechać.',
+    de: 'Ja, er kann hineinfahren.',
+    en: 'Yes, it can enter.',
+    cs: 'Ano, může vjet.',
+    sk: 'Áno, môže vísť.'
+  },
+  product_faq_height_question: {
+    pl: 'Czy {model} przejedzie przez bramę o wysokości 1,90 m?',
+    de: 'Passt der {model} durch ein Tor mit einer Höhe von 1,90 m?',
+    en: 'Will the {model} pass through a gate with a height of 1.90 m?',
+    cs: 'Projede {model} bránou o výšce 1,90 m?',
+    sk: 'Prejde {model} bránou o výške 1,90 m?'
+  },
+  product_faq_height_answer: {
+    pl: 'Tak, jego wysokość całkowita to 1,54 m.',
+    de: 'Ja, seine Gesamthöhe beträgt 1,54 m.',
+    en: 'Yes, its total height is 1.54 m.',
+    cs: 'Ano, jeho celková výška je 1,54 m.',
+    sk: 'Áno, jeho celková výška je 1,54 m.'
+  },
+  product_faq_permits_question: {
+    pl: 'Czy do obsługi tego wózka potrzebne są uprawnienia?',
+    de: 'Sind für den Betrieb dieses Staplers Berechtigungen erforderlich?',
+    en: 'Are permits required to operate this stacker?',
+    cs: 'Jsou pro obsluhu tohoto vozíku potřeba oprávnění?',
+    sk: 'Sú na obsluhu tohto vozíka potrebné oprávnenia?'
+  },
+  product_faq_permits_answer: {
+    pl: 'Tak, wymagane są uprawnienia UDT.',
+    de: 'Ja, UDT-Berechtigungen sind erforderlich.',
+    en: 'Yes, UDT permits are required.',
+    cs: 'Ano, jsou vyžadována oprávnění UDT.',
+    sk: 'Áno, sú potrebné oprávnenia UDT.'
   }
 };

@@ -92,20 +92,24 @@ const ProductDetail = () => {
 
   const productFaqItems = [
     {
-      question: `Czy model ${product.model} może bezpiecznie poruszać się po nawierzchni z kostki brukowej?`,
-      answer: 'Tak, model nadaje się do jazdy po kostce brukowej.',
+      question: t('product_faq_surface_question' as any).replace('{model}', product.model),
+      answer: t('product_faq_surface_answer' as any),
     },
     {
-      question: `Czy model ${product.model} może być użytkowany na powierzchniach kamienistych?`,
-      answer: 'Nie, ten typ wózka nie jest przystosowany do jazdy po kamieniach.',
+      question: t('product_faq_truck_question' as any).replace('{model}', product.model),
+      answer: t('product_faq_truck_answer' as any),
     },
     {
-      question: `Czy wózek ${product.model} umożliwia rozładunek palet z naczepy TIR?`,
-      answer: 'Tak, ten wózek umożliwia rozładunek z TIR-a, zgodnie z zaleceniami producenta.',
+      question: t('product_faq_cold_question' as any),
+      answer: t('product_faq_cold_answer' as any),
     },
     {
-      question: 'Czy wózek może pracować w chłodni przez dłuższy czas?',
-      answer: 'Tak, pod warunkiem zastosowania odpowiedniego oleju hydraulicznego przeznaczonego do pracy w niskich temperaturach.',
+      question: t('product_faq_height_question' as any).replace('{model}', product.model),
+      answer: t('product_faq_height_answer' as any),
+    },
+    {
+      question: t('product_faq_permits_question' as any),
+      answer: t('product_faq_permits_answer' as any),
     },
   ];
 
