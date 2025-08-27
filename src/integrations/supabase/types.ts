@@ -91,6 +91,44 @@ export type Database = {
           },
         ]
       }
+      product_translations: {
+        Row: {
+          created_at: string
+          field_name: string
+          id: string
+          language: string
+          product_id: string
+          translated_value: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          field_name: string
+          id?: string
+          language: string
+          product_id: string
+          translated_value: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          field_name?: string
+          id?: string
+          language?: string
+          product_id?: string
+          translated_value?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_product_translations_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           additional_options: string | null
