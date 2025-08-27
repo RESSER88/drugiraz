@@ -69,32 +69,12 @@ const Index = () => {
     );
   };
 
-  const homeFaqItems = [
-    {
-      question: 'Czy używane wózki są objęte gwarancją?',
-      answer: 'Tak, gwarancja wynosi 3 miesiące na używane wózki – szczegóły zależą od konkretnego egzemplarza.',
-    },
-    {
-      question: 'Czy zapewniacie transport zakupionych wózków?',
-      answer: 'Tak, dostarczamy wózek bezpiecznie pod wskazany adres na terenie Polski – koszt zależy od odległości i parametrów.',
-    },
-    {
-      question: 'Czy oferujecie możliwość leasingu wózków?',
-      answer: 'Tak, umożliwiamy leasing na atrakcyjnych warunkach – skontaktuj się z nami po szczegóły.',
-    },
-    {
-      question: 'W jakich warunkach najlepiej sprawdzą się wózki BT SWE?',
-      answer: 'Najlepiej sprawdzają się wewnątrz i na równych powierzchniach, do załadunku i rozładunku oraz prac magazynowych.',
-    },
-    {
-      question: 'Jakie modele Toyota BT posiadacie w ofercie?',
-      answer: 'Najczęściej dostępne: SWE120L, SWE140L, SWE200D – w wersjach z podestem oraz bez podestu.',
-    },
-    {
-      question: 'Jak można sprawdzić stan używanego wózka?',
-      answer: 'Każdy wózek przechodzi przegląd. Zapraszamy do obejrzenia i jazdy próbnej przed zakupem.',
-    },
-  ];
+  const homeFaqItems = useMemo(() => {
+    return Array.from({ length: 6 }, (_, index) => ({
+      question: t(`home_faq_${index + 1}_question` as any),
+      answer: t(`home_faq_${index + 1}_answer` as any),
+    }));
+  }, [t]);
   return (
     <Layout>
       <Helmet>
@@ -185,7 +165,7 @@ const Index = () => {
         </div>
       </section>
 
-      <FAQSection title="Najczęstsze pytania (FAQ)" items={homeFaqItems} />
+      <FAQSection title={t('faq_section_title')} items={homeFaqItems} />
       <FAQSchema items={homeFaqItems} />
 
       <CallToAction />

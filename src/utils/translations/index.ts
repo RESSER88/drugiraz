@@ -11,6 +11,7 @@ import { pricingTranslations } from './pricing';
 import { adminTranslations } from './admin';
 import { errorsTranslations } from './errors';
 import { testimonialsTranslations } from './testimonials';
+import { faqTranslations } from './faq';
 
 // Aggregate all translations into a single object
 export const translations: Translations = {
@@ -24,7 +25,8 @@ export const translations: Translations = {
   ...pricingTranslations,
   ...adminTranslations,
   ...errorsTranslations,
-  ...testimonialsTranslations
+  ...testimonialsTranslations,
+  ...faqTranslations
 };
 
 export type TranslationKey = keyof typeof translations;
