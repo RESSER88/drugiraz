@@ -35,14 +35,15 @@ const handlePolishText = (text: string): string => {
 };
 
 export const exportProductListToPDF = async (products: Product[]): Promise<void> => {
-  const doc = new jsPDF();
+  const doc = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
   const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
   const today = new Date();
   
   // Nagłówek dokumentu
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text(handlePolishText('LISTA MAGAZYNOWA PRODUKTOW'), pageWidth / 2, 20, { align: 'center' });
+  doc.text(handlePolishText('STAN MAGAZYNU - RAPORT'), pageWidth / 2, 20, { align: 'center' });
   
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -52,28 +53,47 @@ export const exportProductListToPDF = async (products: Product[]): Promise<void>
   // Linia oddzielająca
   doc.setDrawColor('#000000');
   doc.setLineWidth(0.5);
-  doc.line(15, 42, pageWidth - 15, 42);
+  doc.line(15, 40, pageWidth - 15, 40);
   
-  let yPos = 52;
-  const lineHeight = 6;
-  const maxLinesPerPage = 40;
+  let yPos = 50;
+  const lineHeight = 8;
+  const maxLinesPerPage = Math.floor((pageHeight - 80) / lineHeight);
   let currentLine = 0;
   
+  // Pozycje kolumn (dostosowane do poziomego układu)
+  const cols = {
+    nr: 15,
+    model: 25,
+    serial: 85,
+    year: 120,
+    mastCap: 140,
+    prelCap: 170,
+    hours: 200,
+    liftHeight: 225,
+    minHeight: 255,
+    battery: 275
+  };
+  
   // Nagłówki tabeli
-  doc.setFontSize(9);
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
-  doc.text('Nr', 15, yPos);
-  doc.text('Model', 25, yPos);
-  doc.text('Numer seryjny', 90, yPos);
-  doc.text('Rok prod.', 140, yPos);
-  doc.text('Stan', 170, yPos);
+  doc.text('Nr', cols.nr, yPos);
+  doc.text('Model', cols.model, yPos);
+  doc.text('Nr seryjny', cols.serial, yPos);
+  doc.text('Rok', cols.year, yPos);
+  doc.text('Udzwig M', cols.mastCap, yPos);
+  doc.text('Udzwig W', cols.prelCap, yPos);
+  doc.text('Godz', cols.hours, yPos);
+  doc.text('Wys.P', cols.liftHeight, yPos);
+  doc.text('Wys.K', cols.minHeight, yPos);
+  doc.text('Bateria', cols.battery, yPos);
   
   // Linia pod nagłówkami
   doc.setDrawColor('#000000');
   doc.setLineWidth(0.3);
   doc.line(15, yPos + 2, pageWidth - 15, yPos + 2);
   
-  yPos += 8;
+  yPos += 10;
   currentLine += 2;
   
   // Lista produktów
@@ -81,33 +101,66 @@ export const exportProductListToPDF = async (products: Product[]): Promise<void>
   products.forEach((product, index) => {
     // Sprawdź czy trzeba przejść na nową stronę
     if (currentLine >= maxLinesPerPage) {
-      doc.addPage();
+      doc.addPage('l');
       yPos = 20;
       currentLine = 0;
+      
+      // Powtórz nagłówki na nowej stronie
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Nr', cols.nr, yPos);
+      doc.text('Model', cols.model, yPos);
+      doc.text('Nr seryjny', cols.serial, yPos);
+      doc.text('Rok', cols.year, yPos);
+      doc.text('Udzwig M', cols.mastCap, yPos);
+      doc.text('Udzwig W', cols.prelCap, yPos);
+      doc.text('Godz', cols.hours, yPos);
+      doc.text('Wys.P', cols.liftHeight, yPos);
+      doc.text('Wys.K', cols.minHeight, yPos);
+      doc.text('Bateria', cols.battery, yPos);
+      
+      doc.setDrawColor('#000000');
+      doc.setLineWidth(0.3);
+      doc.line(15, yPos + 2, pageWidth - 15, yPos + 2);
+      
+      yPos += 10;
+      currentLine += 2;
+      doc.setFont('helvetica', 'normal');
     }
     
     const serialNumber = product.specs.serialNumber || 'Brak';
     const productionYear = product.specs.productionYear || 'Brak';
-    const condition = product.specs.condition || 'Brak';
+    const mastCapacity = product.specs.mastLiftingCapacity || '0';
+    const prelCapacity = product.specs.preliminaryLiftingCapacity || '0';
+    const workingHours = product.specs.workingHours || '0';
+    const liftHeight = product.specs.liftHeight || '0';
+    const minHeight = product.specs.minHeight || '0';
+    const battery = product.specs.battery || 'Brak';
     
-    doc.text(`${index + 1}`, 15, yPos);
-    doc.text(handlePolishText(product.model.substring(0, 35)), 25, yPos);
-    doc.text(handlePolishText(serialNumber.substring(0, 25)), 90, yPos);
-    doc.text(handlePolishText(productionYear), 140, yPos);
-    doc.text(handlePolishText(condition.substring(0, 15)), 170, yPos);
+    doc.setFontSize(7);
+    doc.text(`${index + 1}`, cols.nr, yPos);
+    doc.text(handlePolishText(product.model.substring(0, 25)), cols.model, yPos);
+    doc.text(handlePolishText(serialNumber.substring(0, 15)), cols.serial, yPos);
+    doc.text(handlePolishText(productionYear), cols.year, yPos);
+    doc.text(handlePolishText(mastCapacity.substring(0, 8)), cols.mastCap, yPos);
+    doc.text(handlePolishText(prelCapacity.substring(0, 8)), cols.prelCap, yPos);
+    doc.text(handlePolishText(workingHours.substring(0, 8)), cols.hours, yPos);
+    doc.text(handlePolishText(liftHeight.substring(0, 8)), cols.liftHeight, yPos);
+    doc.text(handlePolishText(minHeight.substring(0, 8)), cols.minHeight, yPos);
+    doc.text(handlePolishText(battery.substring(0, 12)), cols.battery, yPos);
     
     yPos += lineHeight;
     currentLine++;
   });
   
   // Stopka
-  const footerY = doc.internal.pageSize.height - 20;
+  const footerY = pageHeight - 15;
   doc.setFontSize(8);
   doc.setTextColor('#666666');
   doc.text('FHU STAKERPOL - www.stakerpol.pl', pageWidth / 2, footerY, { align: 'center' });
   
   // Zapisanie pliku
-  const fileName = handlePolishText(`Lista_magazynowa_${formatDate(today).replace(/\./g, '_')}.pdf`);
+  const fileName = handlePolishText(`Stan_magazynu_${formatDate(today).replace(/\./g, '_')}.pdf`);
   doc.save(fileName);
 };
 
@@ -126,29 +179,39 @@ export const exportProductListToJPG = async (products: Product[]): Promise<void>
   
   tempDiv.innerHTML = `
     <div style="text-align: center; margin-bottom: 30px;">
-      <h1 style="font-size: 24px; margin: 0; color: #111827;">LISTA MAGAZYNOWA PRODUKTÓW</h1>
+      <h1 style="font-size: 24px; margin: 0; color: #111827;">STAN MAGAZYNU - RAPORT</h1>
       <p style="font-size: 14px; margin: 10px 0; color: #666;">Data wygenerowania: ${formatDate(today)}</p>
       <p style="font-size: 14px; margin: 0; color: #666;">Liczba produktów: ${products.length}</p>
     </div>
     
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10px;">
       <thead>
         <tr style="background-color: #f8f9fa;">
-          <th style="border: 1px solid #dee2e6; padding: 12px 8px; text-align: left; font-weight: bold; font-size: 12px;">Nr</th>
-          <th style="border: 1px solid #dee2e6; padding: 12px 8px; text-align: left; font-weight: bold; font-size: 12px;">Model</th>
-          <th style="border: 1px solid #dee2e6; padding: 12px 8px; text-align: left; font-weight: bold; font-size: 12px;">Numer seryjny</th>
-          <th style="border: 1px solid #dee2e6; padding: 12px 8px; text-align: left; font-weight: bold; font-size: 12px;">Rok produkcji</th>
-          <th style="border: 1px solid #dee2e6; padding: 12px 8px; text-align: left; font-weight: bold; font-size: 12px;">Stan</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Nr</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Model</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Nr seryjny</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Rok</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Udźwig M</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Udźwig W</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Godz</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Wys.P</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Wys.K</th>
+          <th style="border: 1px solid #dee2e6; padding: 8px 4px; text-align: left; font-weight: bold;">Bateria</th>
         </tr>
       </thead>
       <tbody>
         ${products.map((product, index) => `
           <tr>
-            <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 11px;">${index + 1}</td>
-            <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 11px;">${product.model}</td>
-            <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 11px;">${product.specs.serialNumber || 'Brak'}</td>
-            <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 11px;">${product.specs.productionYear || 'Brak'}</td>
-            <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 11px;">${product.specs.condition || 'Brak'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${index + 1}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.model}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.serialNumber || 'Brak'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.productionYear || 'Brak'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.mastLiftingCapacity || '0'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.preliminaryLiftingCapacity || '0'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.workingHours || '0'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.liftHeight || '0'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.minHeight || '0'}</td>
+            <td style="border: 1px solid #dee2e6; padding: 6px 4px; font-size: 9px;">${product.specs.battery || 'Brak'}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -175,7 +238,7 @@ export const exportProductListToJPG = async (products: Product[]): Promise<void>
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `Lista_magazynowa_${formatDate(today).replace(/\./g, '_')}.jpg`;
+        link.download = `Stan_magazynu_${formatDate(today).replace(/\./g, '_')}.jpg`;
         link.click();
         URL.revokeObjectURL(url);
       }

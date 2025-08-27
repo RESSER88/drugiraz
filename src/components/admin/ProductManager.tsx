@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw, FileText, Image } from 'lucide-react';
+import { Plus, RefreshCw, Download } from 'lucide-react';
 import ProductList from './ProductList';
 import ProductDetailsModal from './ProductDetailsModal';
+import ExportFormatModal from './ExportFormatModal';
 import { Product } from '@/types';
 import { exportProductListToPDF, exportProductListToJPG } from '@/utils/listExporter';
 import { useToast } from '@/hooks/use-toast';
@@ -45,6 +46,7 @@ const ProductManager = ({
   const [refreshing, setRefreshing] = useState(false);
   const [exportingPDF, setExportingPDF] = useState(false);
   const [exportingJPG, setExportingJPG] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const { toast } = useToast();
 
   const handleRefresh = async () => {
@@ -67,17 +69,18 @@ const ProductManager = ({
     }
 
     setExportingPDF(true);
-    try {
-      await exportProductListToPDF(products);
-      toast({
-        title: "Sukces!",
-        description: `Lista magazynowa PDF została wygenerowana (${products.length} produktów)`,
-      });
+      try {
+        await exportProductListToPDF(products);
+        toast({
+          title: "Sukces!",
+          description: `Stan magazynu PDF został wygenerowany (${products.length} produktów)`,
+        });
+        setIsExportModalOpen(false);
     } catch (error) {
       console.error('Error exporting PDF:', error);
       toast({
         title: "Błąd eksportu",
-        description: "Nie udało się wygenerować listy PDF",
+        description: "Nie udało się wygenerować stanu magazynu PDF",
         variant: "destructive"
       });
     } finally {
@@ -100,18 +103,31 @@ const ProductManager = ({
       await exportProductListToJPG(products);
       toast({
         title: "Sukces!",
-        description: `Lista magazynowa JPG została wygenerowana (${products.length} produktów)`,
+        description: `Stan magazynu JPG został wygenerowany (${products.length} produktów)`,
       });
+      setIsExportModalOpen(false);
     } catch (error) {
       console.error('Error exporting JPG:', error);
       toast({
         title: "Błąd eksportu",
-        description: "Nie udało się wygenerować listy JPG",
+        description: "Nie udało się wygenerować stanu magazynu JPG",
         variant: "destructive"
       });
     } finally {
       setExportingJPG(false);
     }
+  };
+
+  const handleExportStockStatus = () => {
+    if (products.length === 0) {
+      toast({
+        title: "Brak produktów",
+        description: "Nie ma produktów do eksportu",
+        variant: "destructive"
+      });
+      return;
+    }
+    setIsExportModalOpen(true);
   };
 
   const handleSave = (product: Product, images: string[]) => {
@@ -150,24 +166,14 @@ const ProductManager = ({
         
         <div className="flex gap-2 w-full sm:w-auto flex-wrap">
           <Button
-            onClick={handleExportPDF}
+            onClick={handleExportStockStatus}
             variant="outline"
             size="sm"
-            disabled={exportingPDF || products.length === 0}
+            disabled={products.length === 0}
             className="flex-1 sm:flex-initial"
           >
-            <FileText className={`mr-2 h-4 w-4 ${exportingPDF ? 'animate-pulse' : ''}`} />
-            {exportingPDF ? 'Eksport PDF...' : 'Eksport PDF'}
-          </Button>
-          <Button
-            onClick={handleExportJPG}
-            variant="outline"
-            size="sm"
-            disabled={exportingJPG || products.length === 0}
-            className="flex-1 sm:flex-initial"
-          >
-            <Image className={`mr-2 h-4 w-4 ${exportingJPG ? 'animate-pulse' : ''}`} />
-            {exportingJPG ? 'Eksport JPG...' : 'Eksport JPG'}
+            <Download className="mr-2 h-4 w-4" />
+            Eksport stan magazyn
           </Button>
           <Button
             onClick={handleRefresh}
@@ -205,6 +211,15 @@ const ProductManager = ({
         onImagesChange={setProductImages}
         onSave={handleSave}
         products={products}
+      />
+      
+      <ExportFormatModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExportPDF={handleExportPDF}
+        onExportJPG={handleExportJPG}
+        isExportingPDF={exportingPDF}
+        isExportingJPG={exportingJPG}
       />
     </div>
   );

@@ -14,7 +14,7 @@ import { Product } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 import TranslationStatsPanel from '@/components/admin/TranslationStatsPanel';
-import ImageStatusTable from '@/components/admin/ImageStatusTable';
+import ImageStatusCard from '@/components/admin/ImageStatusCard';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
@@ -34,8 +34,9 @@ const Admin = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [productImages, setProductImages] = useState<string[]>([]);
   
-  // Translation stats panel state
+  // Settings panel states
   const [isTranslationStatsOpen, setIsTranslationStatsOpen] = useState(false);
+  const [isImageStatusOpen, setIsImageStatusOpen] = useState(false);
   
   const { toast } = useToast();
 
@@ -163,60 +164,13 @@ const Admin = () => {
             </Button>
           </div>
           
-          {/* Enhanced Migration Status Card */}
-          <div className="mt-4 p-4 border rounded-lg bg-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {migrationStats.isCompleted ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-orange-600" />
-                )}
-                <div>
-                  <h3 className="font-semibold">
-                    Status migracji obrazów: {migrationStats.migrationProgress}%
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {migrationStats.isCompleted 
-                      ? `Wszystkie ${migrationStats.storageImages} obrazów w Supabase Storage`
-                      : `${migrationStats.base64Images} obrazów do migracji, ${migrationStats.storageImages} już przeniesione`
-                    }
-                  </p>
-                </div>
-              </div>
-              
-              {!migrationStats.isCompleted && (
-                <Button 
-                  onClick={completeMigration} 
-                  className="cta-button"
-                  disabled={isMonitoring}
-                >
-                  {isMonitoring ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Migracja...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Dokończ migrację
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-          </div>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Statystyki
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -243,51 +197,16 @@ const Admin = () => {
           </TabsContent>
 
 
-          <TabsContent value="stats">
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Produkty</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-stakerpol-navy mb-2">
-                    {products?.length || 0}
-                  </div>
-                  <p className="text-gray-600">Całkowita liczba produktów</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Obrazy</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Base64:</span>
-                      <Badge variant={migrationStats.base64Images > 0 ? "destructive" : "secondary"}>
-                        {migrationStats.base64Images}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Storage:</span>
-                      <Badge variant="default">
-                        {migrationStats.storageImages}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
 
           <TabsContent value="settings">
             <div className="space-y-6">
-              {/* Image Status and Migration */}
-              <ImageStatusTable 
+              {/* Image Status Card (Collapsible) */}
+              <ImageStatusCard 
                 products={products || []}
                 isMonitoring={isMonitoring}
                 completeMigration={completeMigration}
+                isOpen={isImageStatusOpen}
+                onOpenChange={setIsImageStatusOpen}
               />
 
               {/* Translation Stats Panel */}
@@ -295,39 +214,6 @@ const Admin = () => {
                 isOpen={isTranslationStatsOpen}
                 onOpenChange={setIsTranslationStatsOpen}
               />
-
-              {/* System Settings */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Ustawienia systemu</CardTitle>
-                  <CardDescription>
-                    Konfiguracja podstawowych usług
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-semibold">Supabase Storage</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Bucket 'product-images' skonfigurowany
-                        </p>
-                      </div>
-                      <Badge variant="default">Aktywny</Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-semibold">Realtime Sync</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Synchronizacja w czasie rzeczywistym
-                        </p>
-                      </div>
-                      <Badge variant="default">Włączony</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </TabsContent>
         </Tabs>
