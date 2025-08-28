@@ -207,28 +207,48 @@
     }
   }
 
-  /* Slider with circular handles */
+  /* Enhanced slider with better mobile handles */
   .slider-with-handles [data-radix-slider-thumb] {
-    @apply border-2 border-primary bg-background shadow-md;
-    width: 20px;
-    height: 20px;
+    @apply border-3 border-primary bg-background shadow-lg;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
   }
 
   .slider-with-handles [data-radix-slider-thumb]:hover {
-    @apply bg-primary/10 border-primary shadow-lg;
+    @apply bg-primary/5 border-primary shadow-xl scale-110;
+  }
+
+  .slider-with-handles [data-radix-slider-thumb]:active {
+    @apply bg-primary/10 scale-105;
   }
 
   .slider-with-handles [data-radix-slider-thumb]:focus {
-    @apply ring-2 ring-primary ring-offset-2;
+    @apply ring-2 ring-primary ring-offset-2 outline-none;
   }
 
   .slider-with-handles [data-radix-slider-track] {
     @apply bg-muted;
-    height: 6px;
+    height: 8px;
+    border-radius: 4px;
   }
 
   .slider-with-handles [data-radix-slider-range] {
     @apply bg-primary;
+    border-radius: 4px;
+  }
+
+  /* Mobile optimization */
+  @media (max-width: 768px) {
+    .slider-with-handles [data-radix-slider-thumb] {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .slider-with-handles [data-radix-slider-track] {
+      height: 10px;
+    }
   }
 }
 

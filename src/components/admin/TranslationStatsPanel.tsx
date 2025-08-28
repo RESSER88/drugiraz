@@ -75,6 +75,12 @@ const TranslationStatsPanel: React.FC<TranslationStatsProps> = ({ isOpen, onOpen
                   </span>
                 </div>
                 
+                {stats?.limit_reached && (
+                  <div className="text-xs text-red-600 font-medium">
+                    Limit miesięczny wyczerpany
+                  </div>
+                )}
+                
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Wykorzystane</span>
                   <span>
@@ -138,18 +144,21 @@ const TranslationStatsPanel: React.FC<TranslationStatsProps> = ({ isOpen, onOpen
           </Card>
         </div>
 
-        {/* Zadania oczekujące - tylko jeśli istnieją i więcej niż 5 */}
-        {stats?.pending_jobs && stats.pending_jobs > 5 && (
+        {/* Zadania oczekujące - tylko jeśli istnieją i więcej niż 10 */}
+        {stats?.pending_jobs && stats.pending_jobs > 10 && (
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-yellow-500" />
                   <span className="text-sm font-medium">
-                    Oczekuje {stats.pending_jobs} zadań tłumaczeń
+                    Kolejka tłumaczeń: {stats.pending_jobs} zadań
                   </span>
                 </div>
                 <Badge variant="secondary">{stats.pending_jobs}</Badge>
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                Automatyczne przetwarzanie w tle jest aktywne
               </div>
             </CardContent>
           </Card>
