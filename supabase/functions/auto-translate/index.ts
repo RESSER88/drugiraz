@@ -234,7 +234,6 @@ async function translateWithFallback(
 
   throw lastError || new Error('All API keys failed');
 }
-}
 
 async function updateMonthlyStats(charactersUsed: number) {
   const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
@@ -499,14 +498,14 @@ serve(async (req) => {
           translations[lang] = [];
           
           for (const item of faqItems) {
-            const questionTranslated = await translateText(item.question, lang);
-            const answerTranslated = await translateText(item.answer, lang);
+            const questionResult = await translateWithFallback(item.question, lang, 'fallback');
+            const answerResult = await translateWithFallback(item.answer, lang, 'fallback');
             
             totalCharacters += item.question.length + item.answer.length;
             
             translations[lang].push({
-              question: questionTranslated,
-              answer: answerTranslated
+              question: questionResult.text,
+              answer: answerResult.text
             });
 
             // Dodaj małe opóźnienie między żądaniami
@@ -566,9 +565,10 @@ serve(async (req) => {
               .update({ status: 'processing' })
               .eq('id', job.id);
 
-            const translated = await translateText(
+            const result = await translateWithFallback(
               job.source_content, 
               job.target_language, 
+              'fallback',
               job.source_language
             );
 
@@ -577,12 +577,12 @@ serve(async (req) => {
               .from('translation_jobs')
               .update({
                 status: 'completed',
-                translated_content: translated,
-                characters_used: job.source_content.length
+                translated_content: result.text,
+                characters_used: result.charactersUsed
               })
               .eq('id', job.id);
 
-            totalCharacters += job.source_content.length;
+            totalCharacters += result.charactersUsed;
             processedCount++;
 
             console.log(`Processed translation job ${job.id}`);
@@ -625,7 +625,7 @@ serve(async (req) => {
       case 'translate_product_fields': {
         console.log('Processing product fields translation...');
         
-        const { product_id, product_data } = params;
+        const productId = req.url.searchParams.get('productId') || productContent?.productId;
         
         if (!await checkMonthlyLimit()) {
           throw new Error('Monthly translation limit exceeded');
@@ -641,30 +641,29 @@ serve(async (req) => {
         const results = [];
 
         for (const lang of targetLanguages) {
-          console.log(`Translating product ${product_id} fields to ${lang}...`);
+          console.log(`Translating product ${productId} fields to ${lang}...`);
           
           for (const fieldName of fieldsToTranslate) {
-            const sourceText = product_data[fieldName];
+            const sourceText = productContent[fieldName];
             if (!sourceText || sourceText.trim() === '') continue;
 
             try {
-              const translated = await translateText(sourceText, lang);
-              totalCharacters += sourceText.length;
+              const result = await translateWithFallback(sourceText, lang, translationMode);
+              totalCharacters += result.charactersUsed;
 
-              // Zapisz tłumaczenie do tabeli product_translations
               const { error } = await supabase
                 .from('product_translations')
                 .upsert({
-                  product_id,
+                  product_id: productId,
                   language: lang,
                   field_name: fieldName,
-                  translated_value: translated
+                  translated_value: result.text
                 });
 
               if (error) {
                 console.error(`Error saving translation for ${fieldName}:`, error);
               } else {
-                results.push({ product_id, language: lang, field_name: fieldName, status: 'completed' });
+                results.push({ product_id: productId, language: lang, field_name: fieldName, status: 'completed' });
               }
 
               // Małe opóźnienie między żądaniami
@@ -672,7 +671,7 @@ serve(async (req) => {
 
             } catch (error) {
               console.error(`Error translating ${fieldName} to ${lang}:`, error);
-              results.push({ product_id, language: lang, field_name: fieldName, status: 'failed', error: error.message });
+              results.push({ product_id: productId, language: lang, field_name: fieldName, status: 'failed', error: error.message });
             }
           }
         }
