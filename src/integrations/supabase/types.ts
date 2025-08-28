@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      deepl_api_keys: {
+        Row: {
+          api_key_encrypted: string
+          api_key_masked: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_primary: boolean
+          last_sync_at: string | null
+          last_test_at: string | null
+          name: string
+          quota_limit: number | null
+          quota_remaining: number | null
+          quota_reset_date: string | null
+          quota_used: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          api_key_encrypted: string
+          api_key_masked: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_primary?: boolean
+          last_sync_at?: string | null
+          last_test_at?: string | null
+          name: string
+          quota_limit?: number | null
+          quota_remaining?: number | null
+          quota_reset_date?: string | null
+          quota_used?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          api_key_encrypted?: string
+          api_key_masked?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_primary?: boolean
+          last_sync_at?: string | null
+          last_test_at?: string | null
+          name?: string
+          quota_limit?: number | null
+          quota_remaining?: number | null
+          quota_reset_date?: string | null
+          quota_used?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       price_inquiries: {
         Row: {
           created_at: string
@@ -261,6 +315,7 @@ export type Database = {
           status: string
           target_language: string
           translated_content: string | null
+          translation_mode: string | null
           updated_at: string
         }
         Insert: {
@@ -275,6 +330,7 @@ export type Database = {
           status?: string
           target_language: string
           translated_content?: string | null
+          translation_mode?: string | null
           updated_at?: string
         }
         Update: {
@@ -289,7 +345,59 @@ export type Database = {
           status?: string
           target_language?: string
           translated_content?: string | null
+          translation_mode?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      translation_logs: {
+        Row: {
+          api_key_used: string
+          characters_used: number | null
+          created_at: string
+          error_details: string | null
+          field_name: string
+          id: string
+          processing_time_ms: number | null
+          product_id: string | null
+          request_payload: Json | null
+          response_payload: Json | null
+          source_language: string
+          status: string
+          target_language: string
+          translation_mode: string
+        }
+        Insert: {
+          api_key_used: string
+          characters_used?: number | null
+          created_at?: string
+          error_details?: string | null
+          field_name: string
+          id?: string
+          processing_time_ms?: number | null
+          product_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          source_language: string
+          status: string
+          target_language: string
+          translation_mode: string
+        }
+        Update: {
+          api_key_used?: string
+          characters_used?: number | null
+          created_at?: string
+          error_details?: string | null
+          field_name?: string
+          id?: string
+          processing_time_ms?: number | null
+          product_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          source_language?: string
+          status?: string
+          target_language?: string
+          translation_mode?: string
         }
         Relationships: []
       }

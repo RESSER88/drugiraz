@@ -1,17 +1,33 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 interface TranslationRequest {
-  text: string;
-  target_lang: string;
+  action: string;
+  productId?: string;
+  productContent?: any;
+  translationMode?: string;
+  keyId?: string;
+  text?: string;
+  target_lang?: string;
   source_lang?: string;
 }
 
 interface DeepLResponse {
   translations: Array<{
-    detected_source_language: string;
     text: string;
+    detected_source_language?: string;
   }>;
+}
+
+interface DeepLKey {
+  id: string;
+  api_key_encrypted: string;
+  api_key_masked: string;
+  is_primary: boolean;
+  status: string;
+  quota_used: number;
+  quota_remaining: number;
 }
 
 const corsHeaders = {
@@ -19,35 +35,205 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Initialize Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const deepLApiKey = Deno.env.get('DEEPL_API_KEY')!;
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+// Helper function to decrypt API key (simplified - in production use proper encryption)
+function decryptApiKey(encrypted: string): string {
+  // For now, assume the encrypted key is base64 encoded
+  // In production, implement proper decryption
+  try {
+    return atob(encrypted);
+  } catch {
+    return encrypted; // Fallback if not base64
+  }
+}
 
-async function translateText(text: string, targetLang: string, sourceLang = 'pl'): Promise<string> {
-  console.log(`Translating text to ${targetLang}: ${text.substring(0, 100)}...`);
+// Get DeepL API keys with preference for primary
+async function getApiKeys(): Promise<DeepLKey[]> {
+  const { data, error } = await supabase
+    .from('deepl_api_keys')
+    .select('*')
+    .eq('is_active', true)
+    .order('is_primary', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching API keys:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+// Translate text using specific API key
+async function translateText(
+  text: string, 
+  targetLang: string, 
+  apiKey: string,
+  sourceLang = 'pl'
+): Promise<{ text: string; charactersUsed: number }> {
+  const url = 'https://api-free.deepl.com/v2/translate';
   
-  const response = await fetch('https://api-free.deepl.com/v2/translate', {
+  const params = new URLSearchParams({
+    auth_key: apiKey,
+    text: text,
+    source_lang: sourceLang.toUpperCase(),
+    target_lang: targetLang.toUpperCase(),
+  });
+
+  const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Authorization': `DeepL-Auth-Key ${deepLApiKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      text: text,
-      target_lang: targetLang.toUpperCase(),
-      source_lang: sourceLang.toUpperCase(),
-    }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`DeepL API error: ${response.status} - ${errorText}`);
+    throw new Error(`DeepL API error (${response.status}): ${errorText}`);
   }
 
   const data: DeepLResponse = await response.json();
-  return data.translations[0]?.text || text;
+  return {
+    text: data.translations[0]?.text || text,
+    charactersUsed: text.length
+  };
+}
+
+// Check API usage
+async function checkApiUsage(apiKey: string): Promise<{ charactersUsed: number; charactersLimit: number }> {
+  const url = 'https://api-free.deepl.com/v2/usage';
+  
+  const params = new URLSearchParams({
+    auth_key: apiKey
+  });
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
+  });
+
+  if (!response.ok) {
+    throw new Error(`DeepL Usage API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return {
+    charactersUsed: data.character_count || 0,
+    charactersLimit: data.character_limit || 500000
+  };
+}
+
+// Test API connection
+async function testApiConnection(apiKey: string): Promise<{ success: boolean; error?: string; usage?: any }> {
+  try {
+    const usage = await checkApiUsage(apiKey);
+    return { success: true, usage };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Update API key status and quota
+async function updateApiKeyStatus(keyId: string, status: string, usage?: any) {
+  const updateData: any = { 
+    status,
+    last_test_at: new Date().toISOString()
+  };
+
+  if (usage) {
+    updateData.quota_used = usage.charactersUsed;
+    updateData.quota_remaining = usage.charactersLimit - usage.charactersUsed;
+    updateData.quota_limit = usage.charactersLimit;
+    updateData.last_sync_at = new Date().toISOString();
+  }
+
+  await supabase
+    .from('deepl_api_keys')
+    .update(updateData)
+    .eq('id', keyId);
+}
+
+// Log translation attempt
+async function logTranslation(
+  productId: string,
+  apiKeyMasked: string,
+  translationMode: string,
+  fieldName: string,
+  sourceLanguage: string,
+  targetLanguage: string,
+  requestPayload: any,
+  responsePayload: any,
+  status: string,
+  charactersUsed: number,
+  errorDetails?: string,
+  processingTimeMs?: number
+) {
+  await supabase
+    .from('translation_logs')
+    .insert({
+      product_id: productId,
+      api_key_used: apiKeyMasked,
+      translation_mode: translationMode,
+      field_name: fieldName,
+      source_language: sourceLanguage,
+      target_language: targetLanguage,
+      request_payload: requestPayload,
+      response_payload: responsePayload,
+      status,
+      characters_used: charactersUsed,
+      error_details: errorDetails,
+      processing_time_ms: processingTimeMs
+    });
+}
+
+// Translate with fallback logic
+async function translateWithFallback(
+  text: string,
+  targetLang: string,
+  translationMode: string,
+  sourceLang = 'pl'
+): Promise<{ text: string; charactersUsed: number; apiKeyUsed: string }> {
+  const apiKeys = await getApiKeys();
+  
+  if (apiKeys.length === 0) {
+    throw new Error('No active DeepL API keys found');
+  }
+
+  let lastError: Error | null = null;
+
+  // Try primary key first, then secondary
+  for (const keyData of apiKeys) {
+    try {
+      const apiKey = decryptApiKey(keyData.api_key_encrypted);
+      const result = await translateText(text, targetLang, apiKey, sourceLang);
+      
+      // Update usage stats
+      const usage = await checkApiUsage(apiKey);
+      await updateApiKeyStatus(keyData.id, 'active', usage);
+      
+      return {
+        ...result,
+        apiKeyUsed: keyData.api_key_masked
+      };
+    } catch (error) {
+      lastError = error;
+      console.error(`Translation failed with key ${keyData.api_key_masked}:`, error);
+      
+      // Update key status to error
+      await updateApiKeyStatus(keyData.id, 'error');
+      
+      // If this is primary-only mode, don't try fallback
+      if (translationMode === 'primary_only') {
+        break;
+      }
+    }
+  }
+
+  throw lastError || new Error('All API keys failed');
+}
 }
 
 async function updateMonthlyStats(charactersUsed: number) {
@@ -92,28 +278,199 @@ async function checkMonthlyLimit(): Promise<boolean> {
   return data.characters_used < data.characters_limit;
 }
 
+// Main request handler
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { action, ...params } = await req.json();
+    const { action, productId, productContent, translationMode = 'fallback', keyId, text, target_lang, source_lang = 'pl' }: TranslationRequest = await req.json();
     
     switch (action) {
-      case 'translate_text': {
-        const { text, target_lang, source_lang = 'pl' }: TranslationRequest = params;
+      case 'test_connection': {
+        const { data: keyData } = await supabase
+          .from('deepl_api_keys')
+          .select('*')
+          .eq('id', keyId)
+          .single();
+
+        if (!keyData) {
+          return new Response(JSON.stringify({ success: false, error: 'API key not found' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 404
+          });
+        }
+
+        const apiKey = decryptApiKey(keyData.api_key_encrypted);
+        const result = await testApiConnection(apiKey);
         
+        await updateApiKeyStatus(keyData.id, result.success ? 'active' : 'error', result.usage);
+
+        return new Response(JSON.stringify(result), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      case 'refresh_usage': {
+        const apiKeys = await getApiKeys();
+        const results = [];
+
+        for (const keyData of apiKeys) {
+          try {
+            const apiKey = decryptApiKey(keyData.api_key_encrypted);
+            const usage = await checkApiUsage(apiKey);
+            await updateApiKeyStatus(keyData.id, 'active', usage);
+            results.push({ keyId: keyData.id, success: true, usage });
+          } catch (error) {
+            await updateApiKeyStatus(keyData.id, 'error');
+            results.push({ keyId: keyData.id, success: false, error: error.message });
+          }
+        }
+
+        return new Response(JSON.stringify({ results }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      case 'translate_product_specifications': {
+        if (!productId || !productContent) {
+          return new Response(JSON.stringify({ success: false, error: 'Missing productId or productContent' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400
+          });
+        }
+
+        const targetLanguages = ['en', 'de', 'fr', 'cs'];
+        const results = [];
+
+        // Only translate specifications and short description
+        const fieldsToTranslate = {
+          shortDescription: productContent.shortDescription,
+          additionalDescription: productContent.specs?.additionalDescription
+        };
+
+        for (const targetLang of targetLanguages) {
+          for (const [fieldName, fieldValue] of Object.entries(fieldsToTranslate)) {
+            if (!fieldValue) continue;
+
+            const startTime = Date.now();
+            
+            try {
+              const result = await translateWithFallback(
+                fieldValue,
+                targetLang,
+                translationMode
+              );
+
+              const processingTime = Date.now() - startTime;
+
+              // Save translation to database
+              await supabase
+                .from('product_translations')
+                .upsert({
+                  product_id: productId,
+                  language: targetLang,
+                  field_name: fieldName,
+                  translated_value: result.text
+                });
+
+              // Log successful translation
+              await logTranslation(
+                productId,
+                result.apiKeyUsed,
+                translationMode,
+                fieldName,
+                'pl',
+                targetLang,
+                { text: fieldValue },
+                { text: result.text },
+                'success',
+                result.charactersUsed,
+                null,
+                processingTime
+              );
+
+              results.push({
+                field: fieldName,
+                language: targetLang,
+                success: true,
+                charactersUsed: result.charactersUsed,
+                apiKeyUsed: result.apiKeyUsed
+              });
+
+            } catch (error) {
+              const processingTime = Date.now() - startTime;
+
+              // Log failed translation
+              await logTranslation(
+                productId,
+                'unknown',
+                translationMode,
+                fieldName,
+                'pl',
+                targetLang,
+                { text: fieldValue },
+                null,
+                'error',
+                0,
+                error.message,
+                processingTime
+              );
+
+              results.push({
+                field: fieldName,
+                language: targetLang,
+                success: false,
+                error: error.message
+              });
+            }
+
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+
+        return new Response(JSON.stringify({ success: true, results }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      case 'get_translation_stats': {
+        // Get API keys usage
+        const { data: apiKeys } = await supabase
+          .from('deepl_api_keys')
+          .select('*')
+          .eq('is_active', true);
+
+        // Get recent translation logs
+        const { data: recentLogs } = await supabase
+          .from('translation_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        return new Response(JSON.stringify({
+          success: true,
+          apiKeys: apiKeys || [],
+          recentLogs: recentLogs || []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      case 'translate_text': {
         if (!await checkMonthlyLimit()) {
           throw new Error('Monthly translation limit exceeded');
         }
         
-        const translated = await translateText(text, target_lang, source_lang);
-        await updateMonthlyStats(text.length);
+        const result = await translateWithFallback(text!, target_lang!, translationMode, source_lang);
+        await updateMonthlyStats(result.charactersUsed);
         
         return new Response(JSON.stringify({ 
-          translated_text: translated,
-          characters_used: text.length 
+          translated_text: result.text,
+          characters_used: result.charactersUsed 
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
