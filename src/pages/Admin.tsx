@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Package, Settings, BarChart3, CheckCircle, AlertCircle, Upload } from 'lucide-react';
+import { Loader2, Package, Settings, BarChart3, CheckCircle, AlertCircle, Upload, Languages } from 'lucide-react';
 import AdminLogin from '@/components/admin/AdminLogin';
 import ProductManager from '@/components/admin/ProductManager';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,7 @@ import { Product } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 import TranslationStatsPanel from '@/components/admin/TranslationStatsPanel';
+import TranslationManager from '@/components/admin/TranslationManager';
 import ImageStatusCard from '@/components/admin/ImageStatusCard';
 
 const Admin = () => {
@@ -167,10 +168,14 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
+            </TabsTrigger>
+            <TabsTrigger value="translations" className="flex items-center gap-2">
+              <Languages className="h-4 w-4" />
+              Tłumaczenia AI
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -196,6 +201,9 @@ const Admin = () => {
             />
           </TabsContent>
 
+          <TabsContent value="translations">
+            <TranslationManager />
+          </TabsContent>
 
 
           <TabsContent value="settings">
