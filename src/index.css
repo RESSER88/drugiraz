@@ -209,7 +209,7 @@
 
   /* Enhanced slider with better mobile handles */
   .slider-with-handles [data-radix-slider-thumb] {
-    @apply border-3 border-primary bg-background shadow-lg;
+    @apply border-2 border-primary bg-background shadow-lg;
     width: 24px;
     height: 24px;
     border-radius: 50%;
