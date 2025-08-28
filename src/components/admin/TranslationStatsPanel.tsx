@@ -2,8 +2,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, Languages, AlertCircle } from 'lucide-react';
+import { ChevronDown, Languages, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAutoTranslation } from '@/hooks/useAutoTranslation';
 
 interface TranslationStatsProps {
@@ -12,9 +13,10 @@ interface TranslationStatsProps {
 }
 
 const TranslationStatsPanel: React.FC<TranslationStatsProps> = ({ isOpen, onOpenChange }) => {
-  const { stats, loading } = useAutoTranslation();
+  const { stats, loading, refreshData, processPendingTranslations } = useAutoTranslation();
 
   const usagePercentage = stats ? (stats.characters_used / stats.characters_limit) * 100 : 0;
+  const remainingCharacters = stats ? stats.characters_limit - stats.characters_used : 500000;
 
   const getLanguageName = (lang: string) => {
     const names = {
@@ -46,26 +48,61 @@ const TranslationStatsPanel: React.FC<TranslationStatsProps> = ({ isOpen, onOpen
           {/* Wykorzystanie DeepL */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                DeepL Quota
-                {stats?.limit_reached && (
-                  <AlertCircle className="h-4 w-4 text-red-500" />
-                )}
+              <CardTitle className="text-sm font-medium flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  DeepL Quota
+                  {stats?.limit_reached && (
+                    <AlertCircle className="h-4 w-4 text-red-500" />
+                  )}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={refreshData}
+                  disabled={loading}
+                  className="h-6 w-6 p-0"
+                >
+                  <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span>Zużycie znaków</span>
+                  <span>Pozostało znaków</span>
+                  <span className={remainingCharacters < 50000 ? 'text-red-600 font-medium' : 'text-green-600 font-medium'}>
+                    {remainingCharacters.toLocaleString()}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Wykorzystane</span>
                   <span>
                     {stats ? `${stats.characters_used.toLocaleString()} / ${stats.characters_limit.toLocaleString()}` : '0 / 500,000'}
                   </span>
                 </div>
+                
                 <Progress value={usagePercentage} className="h-2" />
+                
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>{usagePercentage.toFixed(1)}% wykorzystania</span>
                   <span>{stats?.api_calls || 0} wywołań API</span>
                 </div>
+
+                {remainingCharacters < 50000 && (
+                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+                    Uwaga: Pozostało mało znaków DeepL
+                  </div>
+                )}
+
+                <Button 
+                  onClick={processPendingTranslations}
+                  disabled={loading}
+                  size="sm"
+                  className="w-full mt-3"
+                >
+                  {loading ? 'Przetwarzanie...' : 'Uruchom tłumaczenia'}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -101,8 +138,8 @@ const TranslationStatsPanel: React.FC<TranslationStatsProps> = ({ isOpen, onOpen
           </Card>
         </div>
 
-        {/* Zadania oczekujące */}
-        {stats?.pending_jobs > 0 && (
+        {/* Zadania oczekujące - tylko jeśli istnieją i więcej niż 5 */}
+        {stats?.pending_jobs && stats.pending_jobs > 5 && (
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center justify-between">

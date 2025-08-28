@@ -199,12 +199,36 @@
     }
   }
   
-  /* Extra large desktop - further constraints for product detail */
+/* Extra large desktop - further constraints for product detail */
   @media (min-width: 1440px) {
     .product-detail-image .aspect-\[3\/4\] {
       max-width: 550px;
       max-height: 650px;
     }
+  }
+
+  /* Slider with circular handles */
+  .slider-with-handles [data-radix-slider-thumb] {
+    @apply border-2 border-primary bg-background shadow-md;
+    width: 20px;
+    height: 20px;
+  }
+
+  .slider-with-handles [data-radix-slider-thumb]:hover {
+    @apply bg-primary/10 border-primary shadow-lg;
+  }
+
+  .slider-with-handles [data-radix-slider-thumb]:focus {
+    @apply ring-2 ring-primary ring-offset-2;
+  }
+
+  .slider-with-handles [data-radix-slider-track] {
+    @apply bg-muted;
+    height: 6px;
+  }
+
+  .slider-with-handles [data-radix-slider-range] {
+    @apply bg-primary;
   }
 }
 

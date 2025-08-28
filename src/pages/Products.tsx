@@ -110,6 +110,7 @@ const Products = () => {
             <ProductFilter 
               products={products} 
               onFilterChange={setFilteredProducts}
+              language={language}
             />
           </div>
           

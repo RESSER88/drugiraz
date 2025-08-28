@@ -3,14 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import FilterModal from './FilterModal';
 import { Product } from '@/types';
+import { useTranslation } from '@/utils/translations';
+import { Language } from '@/contexts/LanguageContext';
 
 interface ProductFilterProps {
   products: Product[];
   onFilterChange: (filteredProducts: Product[]) => void;
+  language: Language;
 }
 
-const ProductFilter = ({ products, onFilterChange }: ProductFilterProps) => {
+const ProductFilter = ({ products, onFilterChange, language }: ProductFilterProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const t = useTranslation(language);
 
   return (
     <>
@@ -20,7 +24,7 @@ const ProductFilter = ({ products, onFilterChange }: ProductFilterProps) => {
         className="flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
       >
         <Filter className="h-4 w-4" />
-        Filtruj produkty
+        {t('filterProducts')}
       </Button>
       
       <FilterModal
@@ -28,6 +32,7 @@ const ProductFilter = ({ products, onFilterChange }: ProductFilterProps) => {
         onClose={() => setIsModalOpen(false)}
         products={products}
         onApplyFilters={onFilterChange}
+        language={language}
       />
     </>
   );

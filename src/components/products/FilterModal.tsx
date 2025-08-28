@@ -4,15 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Product } from '@/types';
+import { useTranslation } from '@/utils/translations';
+import { Language } from '@/contexts/LanguageContext';
 
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
   products: Product[];
   onApplyFilters: (filteredProducts: Product[]) => void;
+  language: Language;
 }
 
-const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalProps) => {
+const FilterModal = ({ isOpen, onClose, products, onApplyFilters, language }: FilterModalProps) => {
+  const t = useTranslation(language);
   // Calculate ranges from products data
   const ranges = useMemo(() => {
     const years = products
@@ -79,14 +83,14 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Filtruj produkty</DialogTitle>
+          <DialogTitle>{t('filterProducts')}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6 py-4">
           {/* Production Year Filter */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Rok produkcji: {filters.year[0]} - {filters.year[1]}
+              {t('productionYear')}: {filters.year[0]} - {filters.year[1]}
             </Label>
             <Slider
               value={filters.year}
@@ -94,7 +98,7 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
               min={ranges.year.min}
               max={ranges.year.max}
               step={1}
-              className="w-full"
+              className="w-full slider-with-handles"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>{ranges.year.min}</span>
@@ -105,7 +109,7 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
           {/* Working Hours Filter */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Motogodziny: {filters.hours[0]} - {filters.hours[1]} mh
+              {t('workingHours')}: {filters.hours[0]} - {filters.hours[1]} mh
             </Label>
             <Slider
               value={filters.hours}
@@ -113,7 +117,7 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
               min={ranges.hours.min}
               max={ranges.hours.max}
               step={100}
-              className="w-full"
+              className="w-full slider-with-handles"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>{ranges.hours.min} mh</span>
@@ -124,7 +128,7 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
           {/* Lift Height Filter */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Wysokość podnoszenia: {filters.height[0]} - {filters.height[1]} mm
+              {t('liftHeight')}: {filters.height[0]} - {filters.height[1]} mm
             </Label>
             <Slider
               value={filters.height}
@@ -132,7 +136,7 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
               min={ranges.height.min}
               max={ranges.height.max}
               step={100}
-              className="w-full"
+              className="w-full slider-with-handles"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>{ranges.height.min} mm</span>
@@ -143,17 +147,17 @@ const FilterModal = ({ isOpen, onClose, products, onApplyFilters }: FilterModalP
           {/* Results Preview */}
           <div className="p-3 bg-muted rounded-md">
             <p className="text-sm font-medium">
-              Znalezione produkty: <span className="text-primary">{filteredProducts.length}</span>
+              {t('foundProducts')}: <span className="text-primary">{filteredProducts.length}</span>
             </p>
           </div>
         </div>
 
         <DialogFooter className="flex gap-2">
           <Button variant="outline" onClick={handleReset}>
-            Resetuj
+            {t('reset')}
           </Button>
           <Button onClick={handleApplyFilters}>
-            Zastosuj filtry
+            {t('applyFilters')}
           </Button>
         </DialogFooter>
       </DialogContent>

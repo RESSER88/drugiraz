@@ -84,5 +84,82 @@ export const productsTranslations: Translations = {
     cs: 'Model',
     sk: 'Model',
     de: 'Modell'
+  },
+  filterProducts: {
+    pl: 'Filtruj produkty',
+    en: 'Filter products',
+    cs: 'Filtrovat produkty',
+    sk: 'Filtrovať produkty',
+    de: 'Produkte filtern'
+  },
+  productionYear: {
+    pl: 'Rok produkcji',
+    en: 'Production year',
+    cs: 'Rok výroby',
+    sk: 'Rok výroby',
+    de: 'Produktionsjahr'
+  },
+  workingHours: {
+    pl: 'Motogodziny',
+    en: 'Working hours',
+    cs: 'Provozní hodiny',
+    sk: 'Prevádzkové hodiny',
+    de: 'Betriebsstunden'
+  },
+  liftHeight: {
+    pl: 'Wysokość podnoszenia',
+    en: 'Lift height',
+    cs: 'Výška zdvihu',
+    sk: 'Výška zdvihu',
+    de: 'Hubhöhe'
+  },
+  foundProducts: {
+    pl: 'Znalezione produkty',
+    en: 'Found products',
+    cs: 'Nalezené produkty',
+    sk: 'Nájdené produkty',
+    de: 'Gefundene Produkte'
+  },
+  reset: {
+    pl: 'Resetuj',
+    en: 'Reset',
+    cs: 'Resetovat',
+    sk: 'Resetovať',
+    de: 'Zurücksetzen'
+  },
+  applyFilters: {
+    pl: 'Zastosuj filtry',
+    en: 'Apply filters',
+    cs: 'Použít filtry',
+    sk: 'Použiť filtre',
+    de: 'Filter anwenden'
+  },
+  refresh: {
+    pl: 'Odśwież',
+    en: 'Refresh',
+    cs: 'Obnovit',
+    sk: 'Obnoviť',
+    de: 'Aktualisieren'
+  },
+  charactersRemaining: {
+    pl: 'Pozostało znaków',
+    en: 'Characters remaining',
+    cs: 'Zbývá znaků',
+    sk: 'Zostáva znakov',
+    de: 'Zeichen verbleibend'
+  },
+  limitExhausted: {
+    pl: 'Limit wyczerpany',
+    en: 'Limit exhausted',
+    cs: 'Limit vyčerpán',
+    sk: 'Limit vyčerpaný',
+    de: 'Limit erschöpft'
+  },
+  renewalDate: {
+    pl: 'Odnowienie',
+    en: 'Renewal',
+    cs: 'Obnovení',
+    sk: 'Obnovenie',
+    de: 'Erneuerung'
   }
 };
