@@ -6,6 +6,7 @@ import Layout from '@/components/layout/Layout';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
 import { usePublicSupabaseProducts } from '@/hooks/usePublicSupabaseProducts';
+import { useProductTranslationsDisplay } from '@/hooks/useProductTranslationsDisplay';
 import CallToAction from '@/components/ui/CallToAction';
 import ProductImage from '@/components/products/ProductImage';
 import ProductInfo from '@/components/products/ProductInfo';
@@ -24,6 +25,12 @@ const ProductDetail = () => {
   const { products, isLoading } = usePublicSupabaseProducts();
   
   const product = products.find((p) => p.slug === id || p.id === id);
+  
+  // Fetch translations for the current product and language
+  const { translations, isLoading: translationsLoading } = useProductTranslationsDisplay(
+    product?.id || '', 
+    language
+  );
   
   useEffect(() => {
     // Scroll to top when component mounts or when ID changes
@@ -147,7 +154,12 @@ const ProductDetail = () => {
                   {product.model}
                 </h1>
                 <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                  {product.shortDescription}
+                  {translations.shortDescription || product.shortDescription}
+                  {translationsLoading && language !== 'pl' && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      <Loader2 className="h-3 w-3 animate-spin inline" />
+                    </span>
+                  )}
                 </p>
               </div>
               <ProductInfo product={product} language={language} />

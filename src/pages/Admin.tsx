@@ -168,14 +168,10 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
-            </TabsTrigger>
-            <TabsTrigger value="translations" className="flex items-center gap-2">
-              <Languages className="h-4 w-4" />
-              Tłumaczenia AI
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -201,13 +197,24 @@ const Admin = () => {
             />
           </TabsContent>
 
-          <TabsContent value="translations">
-            <TranslationManager />
-          </TabsContent>
-
-
           <TabsContent value="settings">
             <div className="space-y-6">
+              {/* Translation Management Panel */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Languages className="h-5 w-5" />
+                    Tłumaczenia AI
+                  </CardTitle>
+                  <CardDescription>
+                    Zarządzanie automatycznymi tłumaczeniami produktów za pomocą DeepL API
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <TranslationManager />
+                </CardContent>
+              </Card>
+
               {/* Image Status Card (Collapsible) */}
               <ImageStatusCard 
                 products={products || []}

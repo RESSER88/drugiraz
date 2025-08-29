@@ -1,11 +1,11 @@
 import React from 'react';
-import EnhancedTranslationPanel from './EnhancedTranslationPanel';
+import ImprovedTranslationPanel from './ImprovedTranslationPanel';
 
 const TranslationManager: React.FC = () => {
   return (
     <div className="space-y-6">
-      {/* Enhanced Translation Management with Queue Processing */}
-      <EnhancedTranslationPanel />
+      {/* Improved Translation Management with Automatic Analysis */}
+      <ImprovedTranslationPanel />
     </div>
   );
 };

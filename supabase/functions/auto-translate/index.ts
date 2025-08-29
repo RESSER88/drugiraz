@@ -341,7 +341,7 @@ serve(async (req) => {
           });
         }
 
-        const targetLanguages = ['en', 'de', 'fr', 'cs'];
+        const targetLanguages = ['en', 'de', 'sk', 'cs'];
         const results = [];
 
         // Only translate specifications and short description
@@ -482,7 +482,7 @@ serve(async (req) => {
           throw new Error('Monthly translation limit exceeded');
         }
 
-        const targetLanguages = ['en', 'cs', 'sk', 'de'];
+        const targetLanguages = ['en', 'de', 'sk', 'cs'];
         const faqItems = [
           { question: 'Czy model Toyota SWE 200d może bezpiecznie poruszać się po nawierzchni z kostki brukowej?', answer: 'Tak, model nadaje się do jazdy po kostce.' },
           { question: 'Czy model SWE 200d może być użytkowany na powierzchniach kamienistych?', answer: 'Nie, nie jest przystosowany do jazdy po kamieniach.' },
@@ -631,7 +631,7 @@ serve(async (req) => {
           throw new Error('Monthly translation limit exceeded');
         }
 
-        const targetLanguages = ['en', 'cs', 'sk', 'de'];
+        const targetLanguages = ['en', 'de', 'sk', 'cs'];
         const fieldsToTranslate = [
           'short_description', 'initial_lift', 'condition', 'drive_type', 
           'mast', 'wheels', 'foldable_platform', 'additional_options', 'detailed_description'
@@ -705,7 +705,7 @@ serve(async (req) => {
 
         // Policz przetłumaczone pola produktów per język
         const translationProgress = {};
-        const languages = ['en', 'cs', 'sk', 'de'];
+        const languages = ['en', 'de', 'sk', 'cs'];
         
         for (const lang of languages) {
           const { data: translatedFields } = await supabase
