@@ -44,9 +44,9 @@ export const useProductTranslationsDisplay = (productId: string, language: Langu
         const translatedFields: TranslatedFields = {};
         
         data?.forEach((translation: ProductTranslation) => {
-          if (translation.field_name === 'shortDescription') {
+          if (translation.field_name === 'short_description') {
             translatedFields.shortDescription = translation.translated_value;
-          } else if (translation.field_name === 'additionalDescription') {
+          } else if (translation.field_name === 'detailed_description') {
             translatedFields.additionalDescription = translation.translated_value;
           }
         });

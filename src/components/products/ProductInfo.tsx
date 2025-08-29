@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Product } from '@/types';
 import { Language } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
+import { useProductTranslationsDisplay } from '@/hooks/useProductTranslationsDisplay';
 import ModernSpecificationsTable from './ModernSpecificationsTable';
 import PriceInquiryModal from './PriceInquiryModal';
 
@@ -16,9 +17,22 @@ interface ProductInfoProps {
 const ProductInfo = ({ product, language }: ProductInfoProps) => {
   const t = useTranslation(language);
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
+  const { translations } = useProductTranslationsDisplay(product.id, language);
 
   return (
     <div className="animate-slide-in">
+      {/* Detailed Description Section */}
+      {(translations.additionalDescription || product.specs.additionalDescription) && (
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg">
+          <h3 className="text-xl font-semibold mb-4 text-stakerpol-navy">
+            {t('detailedDescription')}
+          </h3>
+          <div className="text-gray-700 whitespace-pre-line leading-relaxed">
+            {translations.additionalDescription || product.specs.additionalDescription}
+          </div>
+        </div>
+      )}
+      
       <div className="mb-8 flex flex-col sm:flex-row gap-4">
         <Button className="cta-button text-lg" size="lg" asChild>
           <a href="tel:+48694133592">

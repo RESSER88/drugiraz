@@ -161,5 +161,12 @@ export const productsTranslations: Translations = {
     cs: 'Obnovení',
     sk: 'Obnovenie',
     de: 'Erneuerung'
+  },
+  detailedDescription: {
+    pl: 'Szczegółowy opis',
+    en: 'Detailed description',
+    cs: 'Podrobný popis',
+    sk: 'Podrobný popis',
+    de: 'Detaillierte Beschreibung'
   }
 };
