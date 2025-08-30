@@ -16,6 +16,7 @@ import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 import TranslationStatsPanel from '@/components/admin/TranslationStatsPanel';
 import TranslationManager from '@/components/admin/TranslationManager';
 import ImageStatusCard from '@/components/admin/ImageStatusCard';
+import HealthCheck from '@/components/monitoring/HealthCheck';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin, adminLoading, signOut } = useSupabaseAuth();
@@ -168,7 +169,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
@@ -176,6 +177,10 @@ const Admin = () => {
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Ustawienia
+            </TabsTrigger>
+            <TabsTrigger value="monitoring" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Monitoring
             </TabsTrigger>
           </TabsList>
 
@@ -230,6 +235,10 @@ const Admin = () => {
                 onOpenChange={setIsTranslationStatsOpen}
               />
             </div>
+          </TabsContent>
+
+          <TabsContent value="monitoring">
+            <HealthCheck />
           </TabsContent>
         </Tabs>
       </div>

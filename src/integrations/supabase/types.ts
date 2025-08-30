@@ -490,6 +490,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      health_check: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
@@ -551,6 +555,10 @@ export type Database = {
       }
       reset_platform_rotation: {
         Args: { platform_name: string }
+        Returns: Json
+      }
+      security_audit: {
+        Args: Record<PropertyKey, never>
         Returns: Json
       }
       text_to_bytea: {
