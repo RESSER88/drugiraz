@@ -33,7 +33,7 @@ export const measurePerformance = {
       window.performance.measure(name, `${name}-start`, `${name}-end`);
       
       const measure = window.performance.getEntriesByName(name)[0];
-      if (measure) {
+      if (measure && process.env.NODE_ENV === 'development') {
         console.log(`Performance [${name}]: ${measure.duration.toFixed(2)}ms`);
       }
     }
@@ -51,7 +51,9 @@ export const measurePerformance = {
 
 // Web Vitals monitoring
 export const trackWebVitals = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window === 'undefined') return;
+
+  try {
     const sendToGA = (name: string, value: number, id?: string) => {
       try {
         if (window.gtag) {
@@ -63,44 +65,56 @@ export const trackWebVitals = () => {
           });
         }
       } catch (e) {
-        // no-op
+        // Silent fail for GA errors
       }
     };
 
-    // Track Largest Contentful Paint (LCP)
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        console.log('LCP:', entry.startTime);
-        sendToGA('LCP', entry.startTime, (entry as any).id);
-      }
-    }).observe({ entryTypes: ['largest-contentful-paint'] });
+    // Check if PerformanceObserver is supported
+    if (typeof PerformanceObserver === 'undefined') {
+      return;
+    }
 
-    // Track Interaction to Next Paint (INP)
+    // Track Largest Contentful Paint (LCP)
+    try {
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          sendToGA('LCP', entry.startTime, (entry as any).id);
+        }
+      }).observe({ entryTypes: ['largest-contentful-paint'] });
+    } catch (e) {
+      // LCP tracking failed
+    }
+
+    // Track Interaction to Next Paint (INP) with fallback
     import('web-vitals').then(({ onINP }) => {
       try {
         onINP(({ value, id }) => {
-          console.log('INP:', value);
           sendToGA('INP', value, id);
         });
       } catch (e) {
-        // no-op
+        // INP tracking failed
       }
     }).catch(() => {
-      // no-op
+      // web-vitals library failed to load
     });
 
     // Track Cumulative Layout Shift (CLS)
-    let clsValue = 0;
-    new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        const clsEntry = entry as any; // Type assertion for CLS specific properties
-        if (clsEntry.hadRecentInput !== undefined && !clsEntry.hadRecentInput && clsEntry.value) {
-          clsValue += clsEntry.value;
+    try {
+      let clsValue = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const clsEntry = entry as any;
+          if (!clsEntry.hadRecentInput && clsEntry.value) {
+            clsValue += clsEntry.value;
+          }
         }
-      }
-      console.log('CLS:', clsValue);
-      sendToGA('CLS', Number(clsValue.toFixed(4)));
-    }).observe({ entryTypes: ['layout-shift'] });
+        sendToGA('CLS', Number(clsValue.toFixed(4)));
+      }).observe({ entryTypes: ['layout-shift'] });
+    } catch (e) {
+      // CLS tracking failed
+    }
+  } catch (error) {
+    // Complete fallback for any tracking errors
   }
 };
 
