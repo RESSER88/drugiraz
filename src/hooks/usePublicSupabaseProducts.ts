@@ -8,13 +8,14 @@ import {
   SupabaseProduct,
   SupabaseProductImage
 } from '@/types/supabase';
+import { logger } from '@/utils/logger';
 
 export const usePublicSupabaseProducts = () => {
   // Fetch products with optimized caching strategy for public pages
   const { data: products = [], isLoading, error, refetch } = useQuery({
     queryKey: ['public-products'],
     queryFn: async () => {
-      console.log('Fetching products for public pages...');
+      logger.log('Fetching products for public pages...');
       const startTime = performance.now();
       
       // Fetch products - accessible to all users thanks to "Anyone can view products" RLS policy
@@ -24,7 +25,7 @@ export const usePublicSupabaseProducts = () => {
         .order('created_at', { ascending: false });
 
       if (productsError) {
-        console.error('Error fetching products:', productsError);
+        logger.error('Error fetching products:', productsError);
         throw productsError;
       }
 
@@ -35,7 +36,7 @@ export const usePublicSupabaseProducts = () => {
         .order('display_order', { ascending: true });
 
       if (imagesError) {
-        console.error('Error fetching images:', imagesError);
+        logger.error('Error fetching images:', imagesError);
         // Don't throw here, images are optional
       }
 
@@ -47,7 +48,7 @@ export const usePublicSupabaseProducts = () => {
       });
 
       const endTime = performance.now();
-      console.log(`✅ Successfully fetched ${mappedProducts.length} products for public pages in ${(endTime - startTime).toFixed(2)}ms`);
+      logger.log(`✅ Successfully fetched ${mappedProducts.length} products for public pages in ${(endTime - startTime).toFixed(2)}ms`);
       
       return mappedProducts;
     },
@@ -60,7 +61,7 @@ export const usePublicSupabaseProducts = () => {
 
   // Enhanced realtime subscription for immediate sync with admin panel
   useEffect(() => {
-    console.log('Setting up realtime subscriptions for public pages...');
+    logger.log('Setting up realtime subscriptions for public pages...');
     
     // Products subscription with immediate refetch
     const productsChannel = supabase
@@ -73,7 +74,7 @@ export const usePublicSupabaseProducts = () => {
           table: 'products'
         },
         (payload) => {
-          console.log('Public products realtime update detected:', payload);
+          logger.log('Public products realtime update detected:', payload);
           refetch();
         }
       )
@@ -90,14 +91,14 @@ export const usePublicSupabaseProducts = () => {
           table: 'product_images'
         },
         (payload) => {
-          console.log('Public product images realtime update detected:', payload);
+          logger.log('Public product images realtime update detected:', payload);
           refetch();
         }
       )
       .subscribe();
 
     return () => {
-      console.log('Cleaning up realtime subscriptions...');
+      logger.log('Cleaning up realtime subscriptions...');
       supabase.removeChannel(productsChannel);
       supabase.removeChannel(imagesChannel);
     };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { logger } from '@/utils/logger';
 
 interface TranslationStats {
   current_month: string;
@@ -47,7 +48,7 @@ export const useAutoTranslation = () => {
       if (error) throw error;
       setStats(data);
     } catch (error) {
-      console.error('Error loading translation stats:', error);
+      logger.error('Error loading translation stats:', error);
       toast({
         title: 'Błąd',
         description: 'Nie udało się załadować statystyk tłumaczeń',
@@ -67,7 +68,7 @@ export const useAutoTranslation = () => {
       if (error) throw error;
       setJobs((data || []) as TranslationJob[]);
     } catch (error) {
-      console.error('Error loading translation jobs:', error);
+      logger.error('Error loading translation jobs:', error);
       toast({
         title: 'Błąd',
         description: 'Nie udało się załadować zadań tłumaczeń',
@@ -101,7 +102,7 @@ export const useAutoTranslation = () => {
       await loadJobs();
 
     } catch (error) {
-      console.error('Error setting up initial translations:', error);
+      logger.error('Error setting up initial translations:', error);
       toast({
         title: 'Błąd',
         description: error.message || 'Nie udało się uruchomić tłumaczeń',
@@ -145,7 +146,7 @@ export const useAutoTranslation = () => {
       await loadJobs();
 
     } catch (error) {
-      console.error('Error processing translations:', error);
+      logger.error('Error processing translations:', error);
       toast({
         title: 'Błąd',
         description: error.message || 'Nie udało się przetworzyć tłumaczeń',
@@ -168,14 +169,14 @@ export const useAutoTranslation = () => {
 
       if (error) throw error;
 
-      console.log(`Translation scheduled for product ${productId}`);
+      logger.log(`Translation scheduled for product ${productId}`);
       
       // Odśwież statystyki
       await loadStats();
       await loadJobs();
 
     } catch (error) {
-      console.error('Error scheduling product translation:', error);
+      logger.error('Error scheduling product translation:', error);
       toast({
         title: 'Błąd tłumaczenia',
         description: 'Nie udało się zaplanować tłumaczenia produktu',

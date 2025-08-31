@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/utils/logger';
 
 interface LazyImageProps {
   src: string;
@@ -78,11 +79,11 @@ const LazyImage = ({
       
       img.onload = () => {
         setImgSrc(src);
-        console.log(`Image loaded successfully: ${src.substring(0, 50)}...`);
+        logger.log(`Image loaded successfully: ${src.substring(0, 50)}...`);
       };
       
       img.onerror = () => {
-        console.error(`Failed to load image: ${src.substring(0, 50)}...`);
+        logger.error(`Failed to load image: ${src.substring(0, 50)}...`);
         setHasError(true);
         onError?.();
       };
@@ -95,13 +96,13 @@ const LazyImage = ({
   const handleLoad = () => {
     setIsLoaded(true);
     onLoad?.();
-    console.log(`Image displayed: ${src.substring(0, 50)}...`);
+    logger.log(`Image displayed: ${src.substring(0, 50)}...`);
   };
 
   const handleError = () => {
     setHasError(true);
     onError?.();
-    console.error(`Image display error: ${src.substring(0, 50)}...`);
+    logger.error(`Image display error: ${src.substring(0, 50)}...`);
   };
 
   const getAspectRatioClass = () => {
