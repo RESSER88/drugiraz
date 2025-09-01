@@ -14,15 +14,15 @@ export const useProductTranslations = () => {
           action: 'translate_product_fields',
           product_id: productId,
           product_data: {
-            short_description: productData.shortDescription || '',
-            initial_lift: productData.specs?.preliminaryLifting || '',
-            condition: productData.specs?.condition || '',
-            drive_type: productData.specs?.driveType || '',
-            mast: productData.specs?.mast || '',
-            wheels: productData.specs?.wheels || '',
-            foldable_platform: productData.specs?.operatorPlatform || '',
-            additional_options: productData.specs?.additionalOptions || '',
-            detailed_description: productData.specs?.additionalDescription || ''
+            short_description: productData.short_description || productData.shortDescription || '',
+            initial_lift: productData.initial_lift || productData.specs?.preliminaryLifting || '',
+            condition: productData.condition || productData.specs?.condition || '',
+            drive_type: productData.drive_type || productData.specs?.driveType || '',
+            mast: productData.mast || productData.specs?.mast || '',
+            wheels: productData.wheels || productData.specs?.wheels || '',
+            foldable_platform: productData.foldable_platform || productData.specs?.operatorPlatform || '',
+            additional_options: productData.additional_options || productData.specs?.additionalOptions || '',
+            detailed_description: productData.detailed_description || productData.specs?.additionalDescription || ''
           }
         }
       });
