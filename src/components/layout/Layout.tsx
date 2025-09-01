@@ -6,6 +6,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import HreflangLinks from '@/components/seo/HreflangLinks';
 import CookieConsent from '@/components/consent/CookieConsent';
 import GSCVerification from '@/components/seo/GSCVerification';
+import { useProductTranslationIntegration } from '@/hooks/useProductTranslationIntegration';
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,6 +14,9 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   useScrollToTop();
+  
+  // Initialize automatic translation integration for new products
+  useProductTranslationIntegration();
 
   return (
     <div className="min-h-screen flex flex-col">

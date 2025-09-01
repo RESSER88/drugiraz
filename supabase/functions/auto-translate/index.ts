@@ -623,9 +623,14 @@ serve(async (req) => {
       }
 
       case 'translate_product_fields': {
-        console.log('Processing product fields translation...');
+        console.log('Processing product fields translation...', { productContent });
         
-        const productId = req.url.searchParams.get('productId') || productContent?.productId;
+        const requestData = await req.json();
+        const productId = requestData?.product_id || productContent?.productId;
+        
+        if (!productId) {
+          throw new Error('Product ID is required for translation');
+        }
         
         if (!await checkMonthlyLimit()) {
           throw new Error('Monthly translation limit exceeded');
@@ -645,25 +650,34 @@ serve(async (req) => {
           
           for (const fieldName of fieldsToTranslate) {
             const sourceText = productContent[fieldName];
-            if (!sourceText || sourceText.trim() === '') continue;
+            if (!sourceText || sourceText.trim() === '') {
+              console.log(`Skipping empty field: ${fieldName}`);
+              continue;
+            }
 
             try {
+              console.log(`Translating ${fieldName}: "${sourceText.substring(0, 50)}..." to ${lang}`);
               const result = await translateWithFallback(sourceText, lang, translationMode);
               totalCharacters += result.charactersUsed;
 
-              const { error } = await supabase
+              const { data, error } = await supabase
                 .from('product_translations')
                 .upsert({
                   product_id: productId,
                   language: lang,
                   field_name: fieldName,
                   translated_value: result.text
-                });
+                }, {
+                  onConflict: 'product_id,language,field_name'
+                })
+                .select();
 
               if (error) {
                 console.error(`Error saving translation for ${fieldName}:`, error);
+                results.push({ product_id: productId, language: lang, field_name: fieldName, status: 'failed', error: error.message });
               } else {
-                results.push({ product_id: productId, language: lang, field_name: fieldName, status: 'completed' });
+                console.log(`Successfully saved translation for ${fieldName} in ${lang}`);
+                results.push({ product_id: productId, language: lang, field_name: fieldName, status: 'completed', data });
               }
 
               // Małe opóźnienie między żądaniami
@@ -679,6 +693,8 @@ serve(async (req) => {
         if (totalCharacters > 0) {
           await updateMonthlyStats(totalCharacters);
         }
+
+        console.log(`Translation completed. Results:`, results.length, 'total operations');
 
         return new Response(JSON.stringify({ 
           success: true,

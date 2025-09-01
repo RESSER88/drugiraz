@@ -51,6 +51,8 @@ export const useProductTranslationsDisplay = (productId: string, language: Langu
           }
         });
 
+        console.log(`Loaded ${data?.length || 0} translations for product ${productId} in ${language}:`, translatedFields);
+
         setTranslations(translatedFields);
       } catch (err) {
         console.error('Error fetching product translations:', err);

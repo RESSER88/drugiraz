@@ -19,13 +19,17 @@ export const useProductTranslationIntegration = () => {
         async (payload) => {
           console.log('New product detected, scheduling translation:', payload.new);
           
-          // Schedule translation for the new product
+          // Schedule translation for the new product with correct field mapping
           await scheduleProductTranslation(payload.new.id, {
-            model: payload.new.name,
-            shortDescription: payload.new.short_description,
-            specs: {
-              additionalDescription: payload.new.detailed_description
-            }
+            short_description: payload.new.short_description,
+            detailed_description: payload.new.detailed_description,
+            initial_lift: payload.new.initial_lift,
+            condition: payload.new.condition,
+            drive_type: payload.new.drive_type,
+            mast: payload.new.mast,
+            wheels: payload.new.wheels,
+            foldable_platform: payload.new.foldable_platform,
+            additional_options: payload.new.additional_options
           });
         }
       )
