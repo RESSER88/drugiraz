@@ -623,7 +623,7 @@ serve(async (req) => {
       }
 
       case 'translate_product_fields': {
-        console.log('Processing product fields translation...');
+        console.log('Processing product fields translation...', { productId, productContent });
         
         // Use already parsed data from line 288
         const requestProductId = productId || productContent?.product_id;
@@ -649,7 +649,13 @@ serve(async (req) => {
           console.log(`Translating product ${requestProductId} fields to ${lang}...`);
           
           for (const fieldName of fieldsToTranslate) {
-            const sourceText = productContent?.product_data?.[fieldName] || productContent?.[fieldName];
+            // Sprawdź różne możliwe struktury danych
+            const sourceText = productContent?.product_data?.[fieldName] || 
+                              productContent?.[fieldName] || 
+                              productContent?.[fieldName.replace('_', '')];
+            
+            console.log(`Field ${fieldName}: sourceText = "${sourceText?.substring(0, 50)}..."`);
+            
             if (!sourceText || sourceText.trim() === '') {
               console.log(`Skipping empty field: ${fieldName}`);
               continue;
