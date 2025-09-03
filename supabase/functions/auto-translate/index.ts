@@ -285,7 +285,10 @@ serve(async (req) => {
   }
 
   try {
-    const { action, productId, productContent, translationMode = 'fallback', keyId, text, target_lang, source_lang = 'pl' }: TranslationRequest = await req.json();
+    const body = await req.json();
+    console.log('🚨 INCOMING REQUEST BODY:', JSON.stringify(body, null, 2));
+    
+    const { action, productId, productContent, translationMode = 'fallback', keyId, text, target_lang, source_lang = 'pl' }: TranslationRequest = body;
     
     switch (action) {
       case 'test_connection': {
