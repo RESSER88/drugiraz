@@ -623,12 +623,16 @@ serve(async (req) => {
       }
 
       case 'translate_product_fields': {
-        console.log('Processing product fields translation...', { productId, productContent });
+        console.log('🔄 Processing product fields translation...');
+        console.log('📥 Received data:', { productId, productContent });
         
-        // Use already parsed data from line 288
+        // POPRAWKA: Pobieranie product_id bezpośrednio z różnych źródeł
         const requestProductId = productId || productContent?.product_id;
         
+        console.log('🆔 Product ID:', requestProductId);
+        
         if (!requestProductId) {
+          console.error('❌ BŁĄD: Product ID is required for translation');
           throw new Error('Product ID is required for translation');
         }
         
@@ -646,18 +650,16 @@ serve(async (req) => {
         const results = [];
 
         for (const lang of targetLanguages) {
-          console.log(`Translating product ${requestProductId} fields to ${lang}...`);
+          console.log(`🌐 Translating product ${requestProductId} fields to ${lang}...`);
           
           for (const fieldName of fieldsToTranslate) {
-            // Sprawdź różne możliwe struktury danych
-            const sourceText = productContent?.product_data?.[fieldName] || 
-                              productContent?.[fieldName] || 
-                              productContent?.[fieldName.replace('_', '')];
+            // POPRAWKA: Pobieranie danych bezpośrednio z productContent (bez product_data wrapper)
+            const sourceText = productContent?.[fieldName];
             
-            console.log(`Field ${fieldName}: sourceText = "${sourceText?.substring(0, 50)}..."`);
+            console.log(`📝 Field ${fieldName}: sourceText = "${sourceText ? sourceText.substring(0, 50) + '...' : 'EMPTY'}"`);
             
             if (!sourceText || sourceText.trim() === '') {
-              console.log(`Skipping empty field: ${fieldName}`);
+              console.log(`⏭️ Skipping empty field: ${fieldName}`);
               continue;
             }
 

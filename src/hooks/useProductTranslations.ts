@@ -9,22 +9,26 @@ export const useProductTranslations = () => {
     try {
       console.log('Starting automatic translation for product:', productId);
       
+      // POPRAWKA: Wysyłanie danych jako płaska struktura bez product_data
+      const translationPayload = {
+        action: 'translate_product_fields',
+        product_id: productId,
+        // Dane produktu bezpośrednio w payload (bez product_data wrapper)
+        short_description: productData.short_description || productData.shortDescription || '',
+        initial_lift: productData.initial_lift || productData.specs?.preliminaryLifting || '',
+        condition: productData.condition || productData.specs?.condition || '',
+        drive_type: productData.drive_type || productData.specs?.driveType || '',
+        mast: productData.mast || productData.specs?.mast || '',
+        wheels: productData.wheels || productData.specs?.wheels || '',
+        foldable_platform: productData.foldable_platform || productData.specs?.operatorPlatform || '',
+        additional_options: productData.additional_options || productData.specs?.additionalOptions || '',
+        detailed_description: productData.detailed_description || productData.specs?.additionalDescription || ''
+      };
+
+      console.log('PAYLOAD DO EDGE FUNCTION:', translationPayload);
+
       const { data, error } = await supabase.functions.invoke('auto-translate', {
-        body: {
-          action: 'translate_product_fields',
-          product_id: productId,
-          product_data: {
-            short_description: productData.short_description || productData.shortDescription || '',
-            initial_lift: productData.initial_lift || productData.specs?.preliminaryLifting || '',
-            condition: productData.condition || productData.specs?.condition || '',
-            drive_type: productData.drive_type || productData.specs?.driveType || '',
-            mast: productData.mast || productData.specs?.mast || '',
-            wheels: productData.wheels || productData.specs?.wheels || '',
-            foldable_platform: productData.foldable_platform || productData.specs?.operatorPlatform || '',
-            additional_options: productData.additional_options || productData.specs?.additionalOptions || '',
-            detailed_description: productData.detailed_description || productData.specs?.additionalDescription || ''
-          }
-        }
+        body: translationPayload
       });
 
       if (error) {

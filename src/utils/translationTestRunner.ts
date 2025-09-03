@@ -31,21 +31,21 @@ export const testTranslationSystem = async () => {
   // KROK 3: Wykonaj tłumaczenie
   console.log('🚀 KROK 3: Wykonywanie tłumaczenia...');
   
+  // POPRAWKA: Wysyłanie danych z płaską strukturą (bez product_data wrapper)
   const { data, error } = await supabase.functions.invoke('auto-translate', {
     body: {
       action: 'translate_product_fields',
       product_id: testProductId,
-      product_data: {
-        short_description: product.short_description,
-        initial_lift: product.initial_lift,
-        condition: product.condition,
-        drive_type: product.drive_type,
-        mast: product.mast,
-        wheels: product.wheels,
-        foldable_platform: product.foldable_platform,
-        additional_options: product.additional_options,
-        detailed_description: product.detailed_description
-      }
+      // Dane bezpośrednio w body (bez product_data wrapper)
+      short_description: product.short_description,
+      initial_lift: product.initial_lift,
+      condition: product.condition,
+      drive_type: product.drive_type,
+      mast: product.mast,
+      wheels: product.wheels,
+      foldable_platform: product.foldable_platform,
+      additional_options: product.additional_options,
+      detailed_description: product.detailed_description
     }
   });
   

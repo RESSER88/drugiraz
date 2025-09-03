@@ -86,13 +86,18 @@ export const executeMassTranslationMigration = async () => {
           detailed_description: product.detailed_description || ''
         };
 
-        // Wykonaj tłumaczenie
+        // POPRAWKA: Wykonaj tłumaczenie z płaską strukturą danych
+        const translationPayload = {
+          action: 'translate_product_fields',
+          product_id: product.id,
+          // Dane bezpośrednio w payload (bez product_data wrapper)
+          ...productData
+        };
+
+        console.log(`📤 Wysyłanie payload dla ${product.name}:`, translationPayload);
+
         const { data, error } = await supabase.functions.invoke('auto-translate', {
-          body: {
-            action: 'translate_product_fields',
-            product_id: product.id,
-            product_data: productData
-          }
+          body: translationPayload
         });
 
         if (error) {

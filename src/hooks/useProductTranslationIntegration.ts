@@ -19,18 +19,33 @@ export const useProductTranslationIntegration = () => {
         async (payload) => {
           console.log('New product detected, scheduling translation:', payload.new);
           
-          // Schedule translation for the new product with correct field mapping
-          await scheduleProductTranslation(payload.new.id, {
-            short_description: payload.new.short_description,
-            detailed_description: payload.new.detailed_description,
-            initial_lift: payload.new.initial_lift,
-            condition: payload.new.condition,
-            drive_type: payload.new.drive_type,
-            mast: payload.new.mast,
-            wheels: payload.new.wheels,
-            foldable_platform: payload.new.foldable_platform,
-            additional_options: payload.new.additional_options
-          });
+          // POPRAWKA: Automatyczne tłumaczenie dla nowego produktu z płaską strukturą
+          try {
+            const { data, error } = await supabase.functions.invoke('auto-translate', {
+              body: {
+                action: 'translate_product_fields',
+                product_id: payload.new.id,
+                // Dane bezpośrednio (bez wrapper)
+                short_description: payload.new.short_description || '',
+                detailed_description: payload.new.detailed_description || '',
+                initial_lift: payload.new.initial_lift || '',
+                condition: payload.new.condition || '',
+                drive_type: payload.new.drive_type || '',
+                mast: payload.new.mast || '',
+                wheels: payload.new.wheels || '',
+                foldable_platform: payload.new.foldable_platform || '',
+                additional_options: payload.new.additional_options || ''
+              }
+            });
+
+            if (error) {
+              console.error('🚨 Błąd automatycznego tłumaczenia nowego produktu:', error);
+            } else {
+              console.log('✅ Automatyczne tłumaczenie nowego produktu uruchomione:', data);
+            }
+          } catch (error) {
+            console.error('🚨 Krytyczny błąd tłumaczenia nowego produktu:', error);
+          }
         }
       )
       .subscribe();
