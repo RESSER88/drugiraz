@@ -6,18 +6,37 @@ import FAQSchema from '@/components/seo/FAQSchema';
 import SearchInput from '@/components/ui/SearchInput';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/utils/translations';
+import { useSupabaseFAQ } from '@/hooks/useSupabaseFAQ';
 
 const FAQ: React.FC = () => {
   const { language } = useLanguage();
   const t = useTranslation(language);
   const [searchTerm, setSearchTerm] = useState('');
+  const { faqs: supabaseFAQs, loading } = useSupabaseFAQ();
   
-  const faqItems: FAQItem[] = useMemo(() => {
+  // Fallback to static translations if no database FAQs exist
+  const staticFaqItems: FAQItem[] = useMemo(() => {
     return Array.from({ length: 35 }, (_, index) => ({
       question: t(`faq_${index + 1}_question` as any),
       answer: t(`faq_${index + 1}_answer` as any),
     }));
   }, [t]);
+
+  const faqItems: FAQItem[] = useMemo(() => {
+    if (loading) return [];
+    
+    const languageFAQs = supabaseFAQs.filter(faq => faq.language === language);
+    
+    if (languageFAQs.length > 0) {
+      return languageFAQs.map(faq => ({
+        question: faq.question,
+        answer: faq.answer,
+      }));
+    }
+    
+    // Fallback to static content if no database FAQs for current language
+    return staticFaqItems;
+  }, [supabaseFAQs, language, loading, staticFaqItems]);
 
   const filteredFAQItems = useMemo(() => {
     if (!searchTerm.trim()) return faqItems;

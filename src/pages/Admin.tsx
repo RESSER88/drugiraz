@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMigrationMonitor } from '@/hooks/useMigrationMonitor';
 import TranslationStatsPanel from '@/components/admin/TranslationStatsPanel';
 import TranslationManager from '@/components/admin/TranslationManager';
+import FAQManager from '@/components/admin/FAQManager';
 import ImageStatusCard from '@/components/admin/ImageStatusCard';
 import HealthCheck from '@/components/monitoring/HealthCheck';
 import ProductionReadinessPanel from '@/components/admin/ProductionReadinessPanel';
@@ -170,10 +171,14 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produkty
+            </TabsTrigger>
+            <TabsTrigger value="faq" className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              FAQ
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -205,6 +210,10 @@ const Admin = () => {
               addProduct={addProduct}
               updateProduct={updateProduct}
             />
+          </TabsContent>
+
+          <TabsContent value="faq">
+            <FAQManager />
           </TabsContent>
 
           <TabsContent value="settings">
