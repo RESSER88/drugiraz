@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { useSupabaseFAQ, FAQ } from '@/hooks/useSupabaseFAQ';
+import { useToast } from '@/hooks/use-toast';
+import { runFAQMigration } from '@/utils/migrateFAQData';
+import { Download } from 'lucide-react';
 import FAQList from './FAQList';
 import FAQForm from './FAQForm';
 
@@ -14,6 +18,8 @@ const FAQManager: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingFAQ, setEditingFAQ] = useState<FAQ | undefined>();
   const [deletingFAQId, setDeletingFAQId] = useState<string | null>(null);
+  const [migrationLoading, setMigrationLoading] = useState(false);
+  const { toast } = useToast();
 
   const loadFAQs = async () => {
     setLoading(true);
@@ -59,14 +65,48 @@ const FAQManager: React.FC = () => {
     setEditingFAQ(undefined);
   };
 
+  const handleMigration = async () => {
+    setMigrationLoading(true);
+    const result = await runFAQMigration();
+    
+    if (result.success) {
+      toast({
+        title: "Migracja zakończona",
+        description: `Przeniesiono ${result.count} pytań FAQ do bazy danych`,
+      });
+      loadFAQs(); // Refresh the list
+    } else {
+      toast({
+        title: "Błąd migracji",
+        description: "Nie udało się przenieść danych FAQ",
+        variant: "destructive",
+      });
+    }
+    setMigrationLoading(false);
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Zarządzanie FAQ</CardTitle>
-          <CardDescription>
-            Dodawaj, edytuj i zarządzaj pytaniami FAQ w różnych językach
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Zarządzanie FAQ</CardTitle>
+              <CardDescription>
+                Dodawaj, edytuj i zarządzaj pytaniami FAQ w różnych językach
+              </CardDescription>
+            </div>
+            {faqs.length === 0 && !loading && (
+              <Button
+                onClick={handleMigration}
+                disabled={migrationLoading}
+                className="flex items-center space-x-2"
+              >
+                <Download className="h-4 w-4" />
+                <span>{migrationLoading ? 'Migracja...' : 'Migruj FAQ'}</span>
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <FAQList
