@@ -12,8 +12,8 @@ import ProductImage from '@/components/products/ProductImage';
 import ProductInfo from '@/components/products/ProductInfo';
 import ProductHeader from '@/components/products/ProductHeader';
 import RelatedProducts from '@/components/products/RelatedProducts';
-import ProductSchema from '@/components/seo/ProductSchema';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
+import { generateProductSchema } from '@/utils/seo/generateProductSchema';
 import { Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
@@ -120,6 +120,8 @@ const ProductDetail = () => {
     },
   ];
 
+  const productSchemaData = generateProductSchema(product);
+
   return (
     <Layout>
       <Helmet>
@@ -135,8 +137,12 @@ const ProductDetail = () => {
         <meta name="twitter:description" content={getMetaDescription()} />
         <meta name="twitter:image" content={getOgImage()} />
         <link rel="canonical" href={`https://stakerpol.pl/${language}/products/${product.slug || product.id}`} />
+        
+        {/* Product Schema JSON-LD */}
+        <script type="application/ld+json">
+          {JSON.stringify(productSchemaData, null, 2)}
+        </script>
       </Helmet>
-      <ProductSchema product={product} />
       <BreadcrumbSchema items={breadcrumbItems} />
       <section id="product-details" className="bg-white py-12">
         <div className="container-custom">
