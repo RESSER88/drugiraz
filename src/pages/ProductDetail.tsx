@@ -14,6 +14,7 @@ import ProductHeader from '@/components/products/ProductHeader';
 import RelatedProducts from '@/components/products/RelatedProducts';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
 import { generateProductSchema } from '@/utils/seo/generateProductSchema';
+import { useProductSEO } from '@/hooks/useProductSEO';
 import { Loader2 } from 'lucide-react';
 import FAQSection from '@/components/ui/FAQSection';
 import FAQSchema from '@/components/seo/FAQSchema';
@@ -31,6 +32,9 @@ const ProductDetail = () => {
     product?.id || '', 
     language
   );
+
+  // Fetch SEO settings for dynamic JSON-LD schema
+  const { seoSettings } = useProductSEO(product?.id || '');
   
   useEffect(() => {
     // Scroll to top when component mounts or when ID changes
@@ -120,7 +124,7 @@ const ProductDetail = () => {
     },
   ];
 
-  const productSchemaData = generateProductSchema(product);
+  const productSchemaData = generateProductSchema(product, seoSettings);
 
   return (
     <Layout>

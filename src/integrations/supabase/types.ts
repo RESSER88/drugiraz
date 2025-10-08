@@ -178,6 +178,65 @@ export type Database = {
           },
         ]
       }
+      product_seo_settings: {
+        Row: {
+          availability: string | null
+          created_at: string | null
+          enable_schema: boolean | null
+          gtin: string | null
+          id: string
+          item_condition: string | null
+          mpn: string | null
+          price: number | null
+          price_currency: string | null
+          price_valid_until: string | null
+          product_id: string
+          updated_at: string | null
+          validation_errors: Json | null
+          validation_status: string | null
+        }
+        Insert: {
+          availability?: string | null
+          created_at?: string | null
+          enable_schema?: boolean | null
+          gtin?: string | null
+          id?: string
+          item_condition?: string | null
+          mpn?: string | null
+          price?: number | null
+          price_currency?: string | null
+          price_valid_until?: string | null
+          product_id: string
+          updated_at?: string | null
+          validation_errors?: Json | null
+          validation_status?: string | null
+        }
+        Update: {
+          availability?: string | null
+          created_at?: string | null
+          enable_schema?: boolean | null
+          gtin?: string | null
+          id?: string
+          item_condition?: string | null
+          mpn?: string | null
+          price?: number | null
+          price_currency?: string | null
+          price_valid_until?: string | null
+          product_id?: string
+          updated_at?: string | null
+          validation_errors?: Json | null
+          validation_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_seo_settings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_translations: {
         Row: {
           created_at: string

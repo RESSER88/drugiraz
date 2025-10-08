@@ -1,5 +1,6 @@
 import { Product } from '@/types';
 import { testimonials } from '@/data/testimonials/testimonialsData';
+import { ProductSEOSettings } from '@/hooks/useProductSEO';
 
 export interface ProductSchemaData {
   "@context": string;
@@ -49,10 +50,12 @@ export interface ProductSchemaData {
     bestRating: number;
     worstRating: number;
   };
-  offers: {
+  offers?: {
     "@type": string;
     availability: string;
-    priceValidUntil: string;
+    priceValidUntil?: string;
+    price?: string;
+    priceCurrency?: string;
     businessFunction: string;
     seller: {
       "@type": string;
@@ -62,6 +65,8 @@ export interface ProductSchemaData {
     };
   };
   productionDate?: string;
+  gtin?: string;
+  mpn?: string;
 }
 
 const getBrand = (product: Product) => {
@@ -210,13 +215,37 @@ const getCurrentUrl = (product: Product) => {
   return `https://stakerpol.pl/products/${product.slug || product.id}`;
 };
 
-const getPriceValidUntil = () => {
+const getPriceValidUntil = (customDate?: string) => {
+  if (customDate) return customDate;
   const now = new Date();
   const nextYear = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
   return nextYear.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 };
 
-export const generateProductSchema = (product: Product): ProductSchemaData => {
+const mapAvailabilityToSchemaOrg = (availability: string) => {
+  const mapping: Record<string, string> = {
+    'InStock': 'https://schema.org/InStock',
+    'OutOfStock': 'https://schema.org/OutOfStock',
+    'PreOrder': 'https://schema.org/PreOrder',
+    'Discontinued': 'https://schema.org/Discontinued',
+  };
+  return mapping[availability] || 'https://schema.org/InStock';
+};
+
+const mapConditionToSchemaOrg = (condition: string) => {
+  const mapping: Record<string, string> = {
+    'NewCondition': 'https://schema.org/NewCondition',
+    'UsedCondition': 'https://schema.org/UsedCondition',
+    'RefurbishedCondition': 'https://schema.org/RefurbishedCondition',
+    'DamagedCondition': 'https://schema.org/DamagedCondition',
+  };
+  return mapping[condition] || 'https://schema.org/UsedCondition';
+};
+
+export const generateProductSchema = (
+  product: Product, 
+  seoSettings?: ProductSEOSettings | null
+): ProductSchemaData => {
   const reviewsData = getReviewsData();
   
   const schema: ProductSchemaData = {
@@ -240,10 +269,23 @@ export const generateProductSchema = (product: Product): ProductSchemaData => {
     "additionalProperty": getAdditionalProperties(product),
     "review": reviewsData.reviews,
     "aggregateRating": reviewsData.aggregateRating,
-    "offers": {
+  };
+
+  // Add GTIN/MPN if available from SEO settings
+  if (seoSettings?.gtin) {
+    schema.gtin = seoSettings.gtin;
+  }
+  if (seoSettings?.mpn) {
+    schema.mpn = seoSettings.mpn;
+  }
+
+  // Add offers section only if enabled in SEO settings or if no settings exist
+  if (!seoSettings || seoSettings.enable_schema) {
+    const availability = seoSettings?.availability || 'InStock';
+    
+    schema.offers = {
       "@type": "Offer",
-      "availability": "https://schema.org/InStock",
-      "priceValidUntil": getPriceValidUntil(), // Dynamic: 1 year from now
+      "availability": mapAvailabilityToSchemaOrg(availability),
       "businessFunction": "https://schema.org/Sell",
       "seller": {
         "@type": "Organization",
@@ -251,8 +293,15 @@ export const generateProductSchema = (product: Product): ProductSchemaData => {
         "url": "https://stakerpol.pl",
         "telephone": "+48694133592"
       }
+    };
+
+    // Add price if available
+    if (seoSettings?.price) {
+      schema.offers.price = seoSettings.price.toString();
+      schema.offers.priceCurrency = seoSettings.price_currency || 'PLN';
+      schema.offers.priceValidUntil = getPriceValidUntil(seoSettings.price_valid_until);
     }
-  };
+  }
 
   // Add production year if available
   if (product.specs?.productionYear) {
